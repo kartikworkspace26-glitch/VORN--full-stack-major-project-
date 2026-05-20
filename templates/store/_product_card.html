@@ -1,0 +1,46 @@
+{% load static %}
+<article class="product-card">
+  <div class="product-card-img">
+    {% if product.primary_image %}
+    <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}" loading="lazy">
+    {% else %}
+    <div class="product-card-img-placeholder">
+      <span>VORN</span>
+    </div>
+    {% endif %}
+
+    <!-- Badges -->
+    <div class="product-badges">
+      {% if product.is_new_arrival %}<span class="badge badge-new">New</span>{% endif %}
+      {% if product.discount_percentage %}<span class="badge badge-sale">-{{ product.discount_percentage }}%</span>{% endif %}
+      {% if product.is_featured and not product.is_new_arrival %}<span class="badge badge-featured">Featured</span>{% endif %}
+    </div>
+
+    <!-- Wishlist -->
+    <a href="{% url 'toggle_wishlist' product.id %}"
+       class="card-wish-btn {% if product.id in request.session.wishlist %}active{% endif %}"
+       title="{% if product.id in request.session.wishlist %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}"
+       aria-label="Wishlist">
+      <i class="{% if product.id in request.session.wishlist %}fas{% else %}far{% endif %} fa-heart"></i>
+    </a>
+
+    <!-- Quick Shop -->
+    <a href="{% url 'product_detail' product.slug %}" class="card-quick-shop">
+      View Product →
+    </a>
+  </div>
+
+  <div class="product-card-body">
+    <div>
+      <div class="product-card-cat">{{ product.category.name }}</div>
+      <a href="{% url 'product_detail' product.slug %}" class="product-card-name">{{ product.name }}</a>
+    </div>
+    <div class="product-card-price">
+      <span class="price-now">₹{{ product.price }}</span>
+      {% if product.compare_price %}
+      <span class="price-was">₹{{ product.compare_price }}</span>
+      <span class="price-off">{{ product.discount_percentage }}% off</span>
+      {% endif %}
+    </div>
+  </div>
+</article>

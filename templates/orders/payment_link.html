@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Pay for Order #{{ order.order_number }} — VORN{% endblock %}
+
+{% block content %}
+<div class="page-offset">
+  <div class="section" style="padding-top:60px;">
+    <div style="max-width:600px;margin:0 auto;text-align:center;">
+
+      <!-- Icon -->
+      <div style="width:80px;height:80px;border-radius:50%;background:rgba(201,169,110,0.1);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--gold);margin:0 auto 28px;animation:scaleIn 0.5s ease both;">
+        <i class="fa fa-qrcode"></i>
+      </div>
+
+      <span class="label-caps" style="display:block;margin-bottom:12px;">Payment Required</span>
+      <h1 style="font-family:var(--font-heading);font-size:2.5rem;margin-bottom:12px;">Complete Your Payment</h1>
+      <p style="color:var(--gray-400);margin-bottom:8px;">Order <strong style="color:var(--gold);">#{{ order.order_number }}</strong></p>
+      <p style="font-family:var(--font-heading);font-size:2.8rem;color:var(--gold);margin:16px 0 32px;">₹{{ amount_rupees }}</p>
+
+      <!-- Razorpay.me payment button -->
+      <a href="{{ payment_url }}" target="_blank" id="payBtn"
+         class="btn btn-gold btn-lg btn-full" style="font-size:0.85rem;padding:20px;margin-bottom:12px;"
+         onclick="onPayClick()">
+        <i class="fa fa-external-link-alt"></i>&nbsp; Pay ₹{{ amount_rupees }} via Razorpay
+      </a>
+      <p style="font-size:0.72rem;color:var(--gray-500);margin-bottom:32px;">
+        Opens Razorpay's secure payment page in a new tab.<br>
+        Pay using UPI, Card, Net Banking, or Wallet.
+      </p>
+
+      <!-- Step guide -->
+      <div style="background:var(--black-card);border:1px solid var(--black-border);padding:28px;margin-bottom:32px;text-align:left;">
+        <div class="label-caps" style="margin-bottom:20px;text-align:center;">How to complete payment</div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;align-items:flex-start;gap:14px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--black);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:800;flex-shrink:0;">1</div>
+            <div>
+              <div style="font-weight:600;margin-bottom:4px;">Click "Pay via Razorpay" above</div>
+              <div style="font-size:0.8rem;color:var(--gray-400);">Razorpay's secure page will open in a new tab</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:14px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--black);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:800;flex-shrink:0;">2</div>
+            <div>
+              <div style="font-weight:600;margin-bottom:4px;">Pay ₹{{ amount_rupees }} using any method</div>
+              <div style="font-size:0.8rem;color:var(--gray-400);">UPI, GPay, PhonePe, Paytm, Card, Net Banking — all accepted</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:14px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--black);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:800;flex-shrink:0;">3</div>
+            <div>
+              <div style="font-weight:600;margin-bottom:4px;">Come back here and confirm</div>
+              <div style="font-size:0.8rem;color:var(--gray-400);">Click the button below to confirm your payment</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirm payment section (shown after clicking pay) -->
+      <div id="confirmSection" style="display:none;">
+        <div style="background:rgba(76,175,125,0.08);border:1px solid var(--success);padding:20px 24px;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <i class="fa fa-check-circle" style="color:var(--success);font-size:1.2rem;"></i>
+            <span style="font-weight:600;color:var(--success);">Payment opened! Confirm once you've paid.</span>
+          </div>
+          <p style="font-size:0.8rem;color:var(--gray-400);">Enter your Razorpay transaction ID (optional) to help us verify faster.</p>
+        </div>
+        <form method="post" action="{% url 'confirm_payment' order.order_number %}">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-label">Transaction ID <span style="color:var(--gray-400);font-weight:400;">(Optional but recommended)</span></label>
+            <input type="text" name="transaction_id" class="form-control" placeholder="e.g. pay_XXXXXXXXXXXX or UPI ref number">
+            <div class="form-help">Find this in your payment app → Transaction History, or in the Razorpay confirmation SMS/email.</div>
+          </div>
+          <button type="submit" class="btn btn-gold btn-full" style="padding:18px;margin-top:8px;">
+            <i class="fa fa-check"></i> I Have Paid — Confirm Order
+          </button>
+        </form>
+      </div>
+
+      <!-- Show confirm button always as fallback -->
+      <div id="alreadyPaid" style="margin-top:16px;">
+        <button onclick="showConfirm()" class="btn btn-outline btn-full">
+          Already Paid? Confirm Here →
+        </button>
+      </div>
+
+      <!-- Order summary -->
+      <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--black-border);">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.82rem;color:var(--gray-400);">
+          <span>Shipping to</span>
+          <span style="color:var(--cream);">{{ order.city }}, {{ order.state }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.82rem;color:var(--gray-400);">
+          <span>{{ order.items.count }} item{{ order.items.count|pluralize }}</span>
+          <span style="color:var(--cream);">{{ order.full_name }}</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function onPayClick() {
+  setTimeout(showConfirm, 2000);
+}
+function showConfirm() {
+  document.getElementById('confirmSection').style.display = 'block';
+  document.getElementById('alreadyPaid').style.display = 'none';
+  document.getElementById('confirmSection').scrollIntoView({behavior:'smooth'});
+}
+</script>
+{% endblock %}

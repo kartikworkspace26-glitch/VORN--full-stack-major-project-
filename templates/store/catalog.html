@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if active_category %}{{ active_category.name }}{% elif query %}Search: {{ query }}{% else %}Shop All{% endif %} — VORN{% endblock %}
+
+{% block content %}
+<div class="page-offset">
+
+  <!-- Page Hero -->
+  <div class="page-hero">
+    <span class="label-caps">The Collection</span>
+    <h1 class="heading-lg" style="margin-top:12px;">
+      {% if active_category %}{{ active_category.name }}
+      {% elif query %}Results for "{{ query }}"
+      {% elif gender_filter == 'M' %}Men's Collection
+      {% elif gender_filter == 'W' %}Women's Collection
+      {% else %}All Products{% endif %}
+    </h1>
+    {% if active_category.description %}
+    <p style="color:var(--gray-400);margin-top:12px;font-size:0.9rem;max-width:500px;margin-left:auto;margin-right:auto;">{{ active_category.description }}</p>
+    {% endif %}
+  </div>
+
+  <div class="section" style="padding-top: 48px;">
+    <div class="catalog-layout">
+
+      <!-- ─── FILTER SIDEBAR ───────────────────────── -->
+      <aside class="filter-sidebar" id="filterSidebar">
+        <div class="filter-section">
+          <div class="filter-title">Categories</div>
+          <div class="filter-pills" style="flex-direction:column;gap:6px;">
+            <a href="{% url 'catalog' %}" class="filter-pill {% if not active_category %}active{% endif %}">All</a>
+            {% for cat in categories %}
+            <a href="{% url 'catalog' %}?category={{ cat.slug }}{% if gender_filter %}&gender={{ gender_filter }}{% endif %}"
+               class="filter-pill {% if active_category.slug == cat.slug %}active{% endif %}">{{ cat.name }}</a>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-title">Gender</div>
+          <div class="filter-pills" style="flex-direction:column;gap:6px;">
+            <a href="{% url 'catalog' %}{% if active_category %}?category={{ active_category.slug }}{% endif %}"
+               class="filter-pill {% if not gender_filter %}active{% endif %}">All</a>
+            <a href="{% url 'catalog' %}?gender=M{% if active_category %}&category={{ active_category.slug }}{% endif %}"
+               class="filter-pill {% if gender_filter == 'M' %}active{% endif %}">Men</a>
+            <a href="{% url 'catalog' %}?gender=W{% if active_category %}&category={{ active_category.slug }}{% endif %}"
+               class="filter-pill {% if gender_filter == 'W' %}active{% endif %}">Women</a>
+            <a href="{% url 'catalog' %}?gender=U{% if active_category %}&category={{ active_category.slug }}{% endif %}"
+               class="filter-pill {% if gender_filter == 'U' %}active{% endif %}">Unisex</a>
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-title">Price Range</div>
+          <div class="price-range">
+            <input type="range" id="priceSlider" min="0" max="20000" value="{{ max_price|default:20000 }}" step="500"
+                   oninput="updatePriceLabel(this.value)">
+            <div class="price-range-labels">
+              <span>₹0</span>
+              <span id="priceLabel">Up to ₹{{ max_price|default:"20,000" }}</span>
+            </div>
+            <a href="#" id="applyPrice" class="btn btn-ghost btn-sm btn-full" style="margin-top:12px;" onclick="applyPriceFilter(event)">Apply</a>
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-title">Quick Search</div>
+          <form action="{% url 'catalog' %}" method="get" style="display:flex;gap:8px;">
+            <input type="text" name="q" value="{{ query }}" placeholder="Search…" class="form-control" style="font-size:0.82rem;">
+            <button type="submit" class="btn btn-gold btn-sm" style="flex-shrink:0;"><i class="fa fa-search"></i></button>
+          </form>
+        </div>
+
+        {% if active_category or gender_filter or query or max_price %}
+        <a href="{% url 'catalog' %}" class="btn btn-ghost btn-sm btn-full" style="margin-top:8px;">
+          <i class="fa fa-times"></i> Clear Filters
+        </a>
+        {% endif %}
+      </aside>
+
+      <!-- ─── PRODUCT AREA ──────────────────────────── -->
+      <div>
+        <!-- Toolbar -->
+        <div class="catalog-toolbar">
+          <span class="catalog-count">
+            <strong style="color:var(--gold);">{{ products|length }}</strong>
+            <span style="color:var(--gray-400);"> product{{ products|length|pluralize }}</span>
+          </span>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <select class="sort-select" onchange="window.location=this.value" aria-label="Sort by">
+              {% for val,label in sort_options.items %}
+              <option value="{% url 'catalog' %}?sort={{ val }}{% if active_category %}&category={{ active_category.slug }}{% endif %}{% if gender_filter %}&gender={{ gender_filter }}{% endif %}"
+                {% if current_sort == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            <div class="view-toggle">
+              <button class="view-btn active" id="gridViewBtn" onclick="setView('grid',this)" title="Grid view">
+                <i class="fa fa-th"></i>
+              </button>
+              <button class="view-btn" id="listViewBtn" onclick="setView('list',this)" title="List view">
+                <i class="fa fa-list"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active filter pills -->
+        {% if active_category or gender_filter or query %}
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;">
+          {% if active_category %}
+          <span class="filter-pill active" style="cursor:default;">
+            {{ active_category.name }}
+            <a href="{% url 'catalog' %}{% if gender_filter %}?gender={{ gender_filter }}{% endif %}" style="margin-left:6px;color:var(--gold);">×</a>
+          </span>
+          {% endif %}
+          {% if gender_filter %}
+          <span class="filter-pill active" style="cursor:default;">
+            {% if gender_filter == 'M' %}Men{% elif gender_filter == 'W' %}Women{% else %}Unisex{% endif %}
+            <a href="{% url 'catalog' %}{% if active_category %}?category={{ active_category.slug }}{% endif %}" style="margin-left:6px;color:var(--gold);">×</a>
+          </span>
+          {% endif %}
+          {% if query %}
+          <span class="filter-pill active" style="cursor:default;">
+            "{{ query }}"
+            <a href="{% url 'catalog' %}" style="margin-left:6px;color:var(--gold);">×</a>
+          </span>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Products -->
+        {% if products %}
+        <div class="product-grid" id="productGrid">
+          {% for p in products %}
+          {% include 'store/_product_card.html' with product=p %}
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-state-icon"><i class="fa fa-search"></i></div>
+          <h2>No products found</h2>
+          <p>Try adjusting your filters or search a different term.</p>
+          <a href="{% url 'catalog' %}" class="btn btn-gold">Browse All Products</a>
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function setView(mode, btn) {
+  const grid = document.getElementById('productGrid');
+  if (!grid) return;
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (mode === 'list') {
+    grid.style.gridTemplateColumns = '1fr';
+    grid.querySelectorAll('.product-card').forEach(c => {
+      c.style.display = 'flex'; c.style.flexDirection = 'row';
+    });
+    grid.querySelectorAll('.product-card-img').forEach(i => {
+      i.style.width = '160px'; i.style.flexShrink = '0'; i.style.aspectRatio = 'auto';
+    });
+  } else {
+    grid.style.gridTemplateColumns = '';
+    grid.querySelectorAll('.product-card').forEach(c => {
+      c.style.display = ''; c.style.flexDirection = '';
+    });
+    grid.querySelectorAll('.product-card-img').forEach(i => {
+      i.style.width = ''; i.style.flexShrink = ''; i.style.aspectRatio = '';
+    });
+  }
+}
+
+function updatePriceLabel(val) {
+  document.getElementById('priceLabel').textContent = 'Up to ₹' + Number(val).toLocaleString('en-IN');
+}
+
+function applyPriceFilter(e) {
+  e.preventDefault();
+  const val = document.getElementById('priceSlider').value;
+  const url = new URL(window.location.href);
+  url.searchParams.set('max_price', val);
+  window.location = url.toString();
+}
+
+// Restore price label on load
+const slider = document.getElementById('priceSlider');
+if (slider) updatePriceLabel(slider.value);
+</script>
+{% endblock %}

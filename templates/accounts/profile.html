@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}My Profile — VORN{% endblock %}
+{% block content %}
+<div class="page-top">
+  <div class="page-hero">
+    <span class="label-caps">My Account</span>
+    <h1 class="heading-lg" style="margin-top:12px;">Profile</h1>
+  </div>
+  <div class="section" style="padding-top:40px;max-width:700px;">
+    <div style="background:var(--black-card);border:1px solid var(--black-border);padding:40px;margin-bottom:24px;">
+      <h3 style="font-family:var(--font-heading);font-size:1.5rem;margin-bottom:28px;">Personal Information</h3>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" value="{{ user.email }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-control" value="{{ user.username }}" disabled style="opacity:0.5;">
+        </div>
+        <button type="submit" class="btn btn-gold">Save Changes</button>
+      </form>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <a href="{% url 'order_history' %}" class="btn btn-outline">My Orders</a>
+      <a href="{% url 'wishlist' %}" class="btn btn-outline">My Wishlist</a>
+      <a href="{% url 'logout' %}" class="btn btn-dark">Logout</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

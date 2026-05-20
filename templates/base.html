@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{% block meta_description %}VORN — Refined Luxury Fashion. Timeless pieces crafted for the discerning.{% endblock %}">
+  <title>{% block title %}VORN — Refined Luxury Fashion{% endblock %}</title>
+  {% load static %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/vorn.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- ═══ ANNOUNCEMENT BAR ════════════════════════ -->
+<div class="announce-bar" id="announceBar">
+  <span class="announce-text">Free Shipping Over ₹999</span>
+  <span class="announce-sep">✦</span>
+  <span class="announce-text">New Arrivals Every Week</span>
+  <span class="announce-sep">✦</span>
+  <span class="announce-text">Use Code: VORN10 for 10% Off</span>
+  <button class="announce-close" id="announceClose" aria-label="Close">✕</button>
+</div>
+
+<!-- ═══ NAVBAR ══════════════════════════════════ -->
+<nav class="navbar" id="mainNav">
+  <a href="{% url 'home' %}" class="navbar-brand">VORN</a>
+
+  <ul class="navbar-nav">
+    <li><a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+    <li>
+      <a href="{% url 'catalog' %}">Shop</a>
+      <div class="nav-dropdown">
+        <a href="{% url 'catalog' %}">All Products</a>
+        <a href="{% url 'catalog' %}?category=shirts">Shirts</a>
+        <a href="{% url 'catalog' %}?category=trousers">Trousers</a>
+        <a href="{% url 'catalog' %}?category=outerwear">Outerwear</a>
+        <a href="{% url 'catalog' %}?category=knitwear">Knitwear</a>
+        <a href="{% url 'catalog' %}?category=accessories">Accessories</a>
+        <a href="{% url 'catalog' %}?category=footwear">Footwear</a>
+      </div>
+    </li>
+    <li><a href="{% url 'catalog' %}?gender=M">Men</a></li>
+    <li><a href="{% url 'catalog' %}?gender=W">Women</a></li>
+    <li><a href="{% url 'catalog' %}?is_new=1">New Arrivals</a></li>
+  </ul>
+
+  <div class="navbar-actions">
+    <a href="{% url 'search' %}" title="Search"><i class="fa fa-search"></i></a>
+    <a href="{% url 'wishlist' %}" title="Wishlist"><i class="far fa-heart"></i></a>
+    <a href="{% url 'cart' %}" title="Bag" style="position:relative;">
+      <i class="fa fa-shopping-bag"></i>
+      {% if cart_count %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}
+    </a>
+    {% if user.is_authenticated %}
+    <a href="{% url 'profile' %}" title="Account"><i class="far fa-user"></i></a>
+    {% else %}
+    <a href="{% url 'login' %}" title="Login"><i class="far fa-user"></i></a>
+    {% endif %}
+  </div>
+
+  <button class="navbar-toggle" id="navToggle" aria-label="Open Menu">
+    <i class="fa fa-bars" id="navIcon"></i>
+  </button>
+</nav>
+
+<!-- ═══ MOBILE MENU ═══════════════════════════════ -->
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <div class="mobile-menu-item"><a href="{% url 'home' %}">Home</a></div>
+  <div class="mobile-menu-item"><a href="{% url 'catalog' %}">Shop All</a></div>
+  <div class="mobile-menu-item"><a href="{% url 'catalog' %}?gender=M">Men</a></div>
+  <div class="mobile-menu-item"><a href="{% url 'catalog' %}?gender=W">Women</a></div>
+  <div class="mobile-menu-item"><a href="{% url 'catalog' %}?is_new=1">New Arrivals</a></div>
+  {% if user.is_authenticated %}
+  <div class="mobile-menu-item"><a href="{% url 'profile' %}">My Account</a></div>
+  <div class="mobile-menu-item"><a href="{% url 'logout' %}">Logout</a></div>
+  {% else %}
+  <div class="mobile-menu-item"><a href="{% url 'login' %}">Login</a></div>
+  <div class="mobile-menu-item"><a href="{% url 'register' %}">Create Account</a></div>
+  {% endif %}
+  <div class="mobile-menu-icons">
+    <a href="{% url 'search' %}" title="Search"><i class="fa fa-search"></i></a>
+    <a href="{% url 'wishlist' %}" title="Wishlist"><i class="far fa-heart"></i></a>
+    <a href="{% url 'cart' %}" title="Bag"><i class="fa fa-shopping-bag"></i></a>
+  </div>
+</div>
+
+<!-- ═══ TOASTS ════════════════════════════════════ -->
+{% if messages %}
+<div class="toast-container" id="toastContainer">
+  {% for msg in messages %}
+  <div class="toast {% if 'error' in msg.tags %}toast-error{% elif 'success' in msg.tags %}toast-success{% endif %}">
+    <span class="toast-icon">
+      {% if 'success' in msg.tags %}<i class="fa fa-check-circle"></i>
+      {% elif 'error' in msg.tags %}<i class="fa fa-exclamation-circle"></i>
+      {% elif 'warning' in msg.tags %}<i class="fa fa-exclamation-triangle"></i>
+      {% else %}<i class="fa fa-info-circle"></i>{% endif %}
+    </span>
+    <span>{{ msg }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ═══ MAIN ══════════════════════════════════════ -->
+<main>{% block content %}{% endblock %}</main>
+
+<!-- ═══ FOOTER ════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">VORN</div>
+      <p class="footer-tagline">Refined luxury for the discerning individual. Crafted with intention, worn with purpose.</p>
+      <div class="footer-social">
+        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest"></i></a>
+        <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Shop</div>
+      <div class="footer-links">
+        <a href="{% url 'catalog' %}">All Products</a>
+        <a href="{% url 'catalog' %}?gender=M">Men</a>
+        <a href="{% url 'catalog' %}?gender=W">Women</a>
+        <a href="{% url 'catalog' %}?is_new=1">New Arrivals</a>
+        <a href="{% url 'catalog' %}?category=accessories">Accessories</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Account</div>
+      <div class="footer-links">
+        {% if user.is_authenticated %}
+        <a href="{% url 'profile' %}">My Profile</a>
+        <a href="{% url 'order_history' %}">My Orders</a>
+        <a href="{% url 'wishlist' %}">Wishlist</a>
+        <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'register' %}">Create Account</a>
+        <a href="{% url 'order_history' %}">Track Order</a>
+        {% endif %}
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Help</div>
+      <div class="footer-links">
+        <a href="#">About VORN</a>
+        <a href="#">Size Guide</a>
+        <a href="#">Shipping Policy</a>
+        <a href="#">Returns & Exchanges</a>
+        <a href="#">Contact Us</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-bottom-left">© 2026 VORN. All rights reserved.</p>
+    <div class="footer-bottom-right">
+      <span class="footer-payment-badge"><i class="fa fa-lock"></i> SSL Secured</span>
+      <span class="footer-payment-badge"><i class="fa fa-shield-alt"></i> Razorpay Protected</span>
+      <span class="footer-payment-badge"><i class="fa fa-qrcode"></i> UPI Accepted</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // Announce bar
+  const bar = document.getElementById('announceBar');
+  const nav = document.getElementById('mainNav');
+  const close = document.getElementById('announceClose');
+  if (sessionStorage.getItem('announce_closed')) {
+    bar.style.display = 'none';
+    nav.classList.add('announce-hidden');
+  }
+  if (close) {
+    close.addEventListener('click', () => {
+      bar.style.display = 'none';
+      nav.classList.add('announce-hidden');
+      sessionStorage.setItem('announce_closed', '1');
+    });
+  }
+
+  // Navbar scroll
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
+
+  // Mobile menu
+  const toggle = document.getElementById('navToggle');
+  const menu   = document.getElementById('mobileMenu');
+  const icon   = document.getElementById('navIcon');
+  let open = false;
+  toggle.addEventListener('click', () => {
+    open = !open;
+    menu.classList.toggle('open', open);
+    icon.className = open ? 'fa fa-times' : 'fa fa-bars';
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+  // Close mobile menu on link click
+  menu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      open = false; menu.classList.remove('open');
+      icon.className = 'fa fa-bars';
+      document.body.style.overflow = '';
+    });
+  });
+
+  // Auto dismiss toasts
+  const tc = document.getElementById('toastContainer');
+  if (tc) {
+    setTimeout(() => {
+      tc.style.transition = 'opacity 0.5s';
+      tc.style.opacity = '0';
+      setTimeout(() => tc.remove(), 500);
+    }, 4500);
+  }
+})();
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

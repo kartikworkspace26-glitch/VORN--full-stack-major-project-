@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Create Account — VORN{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-left">
+    <div class="auth-form-wrap">
+      <a href="{% url 'home' %}" class="auth-brand">VORN</a>
+      <p class="auth-tagline">Join the circle of the discerning.</p>
+
+      <h2 class="auth-title">Create Account</h2>
+      <p class="auth-subtitle">Join VORN for exclusive access and early drops.</p>
+
+      {% if messages %}
+      {% for msg in messages %}
+      <div class="alert alert-{% if 'error' in msg.tags %}error{% else %}info{% endif %}" style="margin-bottom:20px;">
+        <i class="fa fa-{% if 'error' in msg.tags %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+        <span>{{ msg }}</span>
+      </div>
+      {% endfor %}
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input type="text" name="first_name" class="form-control" placeholder="Puran" autofocus>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" name="last_name" class="form-control" placeholder="Rai">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Username *</label>
+          <input type="text" name="username" class="form-control" required placeholder="puranrai">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input type="email" name="email" class="form-control" required placeholder="you@example.com">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <div style="position:relative;">
+            <input type="password" name="password1" id="pwd1" class="form-control" required
+                   placeholder="Min. 8 characters">
+            <button type="button" onclick="togglePwd('pwd1','eye1')"
+                    style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:0.9rem;">
+              <i class="far fa-eye" id="eye1"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirm Password *</label>
+          <div style="position:relative;">
+            <input type="password" name="password2" id="pwd2" class="form-control" required
+                   placeholder="Repeat your password">
+            <button type="button" onclick="togglePwd('pwd2','eye2')"
+                    style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:0.9rem;">
+              <i class="far fa-eye" id="eye2"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Password strength -->
+        <div id="pwdStrengthWrap" style="margin-bottom:16px;display:none;">
+          <div style="display:flex;gap:4px;margin-bottom:6px;">
+            <div id="bar1" style="flex:1;height:3px;background:var(--black-border);transition:background 0.3s;"></div>
+            <div id="bar2" style="flex:1;height:3px;background:var(--black-border);transition:background 0.3s;"></div>
+            <div id="bar3" style="flex:1;height:3px;background:var(--black-border);transition:background 0.3s;"></div>
+            <div id="bar4" style="flex:1;height:3px;background:var(--black-border);transition:background 0.3s;"></div>
+          </div>
+          <span id="pwdLabel" style="font-size:0.72rem;color:var(--gray-400);"></span>
+        </div>
+
+        <div style="margin-bottom:20px;display:flex;align-items:flex-start;gap:10px;">
+          <input type="checkbox" id="agree" name="agree" required style="margin-top:3px;accent-color:var(--gold);">
+          <label for="agree" style="font-size:0.8rem;color:var(--gray-400);cursor:pointer;">
+            I agree to VORN's <a href="#" style="color:var(--gold);">Terms of Service</a> and <a href="#" style="color:var(--gold);">Privacy Policy</a>.
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-gold btn-full" style="padding:16px;">
+          Create My Account
+        </button>
+      </form>
+
+      <p class="auth-switch">
+        Already have an account?
+        <a href="{% url 'login' %}">Sign In</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <img src="{% static 'images/hero-bg.jpg' %}" alt="VORN">
+    <div class="auth-right-overlay">
+      <div>
+        <p class="label-caps" style="color:var(--gold);margin-bottom:12px;">Member Benefits</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;color:var(--white);font-size:0.85rem;">
+            <i class="fa fa-star" style="color:var(--gold);font-size:0.8rem;"></i> Early access to new drops
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;color:var(--white);font-size:0.85rem;">
+            <i class="fa fa-tag" style="color:var(--gold);font-size:0.8rem;"></i> Exclusive member discounts
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;color:var(--white);font-size:0.85rem;">
+            <i class="fa fa-box" style="color:var(--gold);font-size:0.8rem;"></i> Order tracking & history
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;color:var(--white);font-size:0.85rem;">
+            <i class="fa fa-heart" style="color:var(--gold);font-size:0.8rem;"></i> Persistent wishlist
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePwd(id, iconId) {
+  const el = document.getElementById(id);
+  const icon = document.getElementById(iconId);
+  el.type = el.type === 'password' ? 'text' : 'password';
+  icon.className = el.type === 'password' ? 'far fa-eye' : 'far fa-eye-slash';
+}
+
+document.getElementById('pwd1').addEventListener('input', function() {
+  const val = this.value;
+  const wrap = document.getElementById('pwdStrengthWrap');
+  if (!val) { wrap.style.display='none'; return; }
+  wrap.style.display = 'block';
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^a-zA-Z0-9]/.test(val)) score++;
+  const colors = ['var(--danger)', 'var(--danger)', '#FFA726', 'var(--success)'];
+  const labels = ['Too weak', 'Weak', 'Good', 'Strong'];
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('bar'+i).style.background = i <= score ? colors[score-1] : 'var(--black-border)';
+  }
+  document.getElementById('pwdLabel').textContent = labels[Math.max(0,score-1)];
+  document.getElementById('pwdLabel').style.color = colors[Math.max(0,score-1)];
+});
+</script>
+{% endblock %}

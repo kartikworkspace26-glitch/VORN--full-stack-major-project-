@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block title %}Your Bag — VORN{% endblock %}
+
+{% block content %}
+<div class="page-offset">
+  <div class="page-hero">
+    <span class="label-caps">Shopping</span>
+    <h1 class="heading-lg" style="margin-top:12px;">Your Bag
+      {% if cart_items %}<span style="font-size:1rem;color:var(--gold);font-family:var(--font-body);letter-spacing:0;">({{ cart_items|length }} item{{ cart_items|length|pluralize }})</span>{% endif %}
+    </h1>
+  </div>
+
+  <div class="section" style="padding-top:48px;">
+    {% if cart_items %}
+    <div class="cart-layout">
+
+      <!-- Cart Items -->
+      <div>
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th colspan="2">Product</th>
+              <th>Size</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in cart_items %}
+            <tr>
+              <td style="width:90px;padding-left:0;">
+                {% if item.image %}
+                <img src="{{ item.image }}" alt="{{ item.name }}" class="cart-img">
+                {% else %}
+                <div class="cart-img" style="display:flex;align-items:center;justify-content:center;background:var(--black-elevated);">
+                  <span style="font-family:var(--font-heading);color:rgba(201,169,110,0.3);font-size:0.8rem;">VORN</span>
+                </div>
+                {% endif %}
+              </td>
+              <td>
+                <div style="font-family:var(--font-heading);font-size:1.05rem;margin-bottom:4px;">{{ item.name }}</div>
+                {% if item.color %}<div style="font-size:0.75rem;color:var(--gray-400);">{{ item.color }}</div>{% endif %}
+              </td>
+              <td>
+                <span style="color:var(--gold);font-size:0.82rem;font-weight:600;">{{ item.size|default:"—" }}</span>
+              </td>
+              <td>
+                <span style="font-weight:600;">₹{{ item.price }}</span>
+              </td>
+              <td>
+                <form method="post" action="{% url 'update_cart' item.key %}" style="display:inline;">
+                  {% csrf_token %}
+                  <div class="qty-control">
+                    <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}" class="qty-btn">−</button>
+                    <span class="qty-display">{{ item.quantity }}</span>
+                    <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}" class="qty-btn">+</button>
+                  </div>
+                </form>
+              </td>
+              <td>
+                <span style="color:var(--gold);font-weight:700;">₹{{ item.subtotal }}</span>
+              </td>
+              <td style="padding-right:0;">
+                <a href="{% url 'remove_from_cart' item.key %}"
+                   style="color:var(--gray-500);font-size:1rem;transition:color 0.2s;"
+                   onmouseover="this.style.color='var(--danger)'"
+                   onmouseout="this.style.color='var(--gray-500)'"
+                   title="Remove item">
+                  <i class="fa fa-times-circle"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div style="display:flex;gap:12px;margin-top:28px;align-items:center;flex-wrap:wrap;">
+          <a href="{% url 'catalog' %}" class="btn btn-ghost btn-sm">← Continue Shopping</a>
+          <span style="font-size:0.75rem;color:var(--gray-500);">Changes save automatically</span>
+        </div>
+
+        <!-- Coupon banner on cart page -->
+        <div style="margin-top:32px;padding:20px 24px;background:var(--black-elevated);border:1px dashed var(--black-border-light);display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <i class="fa fa-tag" style="color:var(--gold);"></i>
+          <span style="font-size:0.8rem;color:var(--gray-400);">Have a coupon? Apply it at checkout.</span>
+          <span style="font-size:0.75rem;color:var(--gold);margin-left:auto;">Try: VORN10 · WELCOME20 · FLAT500</span>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="order-box">
+        <div class="order-box-title">Order Summary</div>
+
+        <!-- Mini product list -->
+        <div style="margin-bottom:20px;">
+          {% for item in cart_items %}
+          <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--black-border);">
+            {% if item.image %}
+            <img src="{{ item.image }}" style="width:44px;height:56px;object-fit:cover;flex-shrink:0;" alt="">
+            {% endif %}
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ item.name }}</div>
+              <div style="font-size:0.72rem;color:var(--gray-400);">{{ item.size }} · Qty {{ item.quantity }}</div>
+            </div>
+            <div style="color:var(--gold);font-size:0.85rem;font-weight:600;flex-shrink:0;">₹{{ item.subtotal }}</div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="summary-row">
+          <span class="summary-row-label">Subtotal</span>
+          <span>₹{{ total }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-row-label">Shipping</span>
+          <span>{% if total >= 999 %}<span style="color:var(--success);">Free ✓</span>{% else %}₹99{% endif %}</span>
+        </div>
+        {% if total < 999 %}
+        <div style="padding:10px 0;font-size:0.75rem;color:var(--gold);border-bottom:1px solid var(--black-border);">
+          Add ₹{{ 999|add:"-1" }} more for free shipping
+        </div>
+        {% endif %}
+        <div class="summary-total-row">
+          <span class="summary-total-label">Total</span>
+          <span class="summary-total-amount">₹{% if total >= 999 %}{{ total }}{% else %}{{ total|add:99 }}{% endif %}</span>
+        </div>
+
+        <a href="{% url 'checkout' %}" class="btn btn-gold btn-full" style="margin-top:24px;padding:18px;">
+          <i class="fa fa-lock"></i> Proceed to Checkout
+        </a>
+
+        <div class="trust-badges" style="justify-content:center;flex-wrap:wrap;">
+          <div class="trust-badge"><i class="fa fa-shield-alt"></i> Secure</div>
+          <div class="trust-badge"><i class="fa fa-qrcode"></i> UPI</div>
+          <div class="trust-badge"><i class="fa fa-credit-card"></i> Cards</div>
+          <div class="trust-badge"><i class="fa fa-university"></i> Net Banking</div>
+        </div>
+      </div>
+
+    </div>
+    {% else %}
+    <div class="empty-state" style="padding: 120px 24px;">
+      <div class="empty-state-icon"><i class="fa fa-shopping-bag"></i></div>
+      <h2>Your bag is empty</h2>
+      <p>Discover our curated collection of refined luxury pieces.</p>
+      <a href="{% url 'catalog' %}" class="btn btn-gold btn-lg">Shop Now</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

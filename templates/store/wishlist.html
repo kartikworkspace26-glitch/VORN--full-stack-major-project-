@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Wishlist — VORN{% endblock %}
+
+{% block content %}
+<div class="page-offset">
+  <div class="page-hero">
+    <span class="label-caps">Your Curation</span>
+    <h1 class="heading-lg" style="margin-top:12px;">Wishlist
+      {% if products %}<span style="font-size:1rem;color:var(--gold);font-family:var(--font-body);">({{ products|length }})</span>{% endif %}
+    </h1>
+  </div>
+  <div class="section" style="padding-top:48px;">
+    {% if products %}
+    <div class="product-grid">
+      {% for p in products %}{% include 'store/_product_card.html' with product=p %}{% endfor %}
+    </div>
+    <div class="text-center mt-48">
+      <a href="{% url 'catalog' %}" class="btn btn-outline">Continue Shopping</a>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="far fa-heart"></i></div>
+      <h2>Your wishlist is empty</h2>
+      <p>Save your favourite pieces by clicking the heart icon on any product.</p>
+      <a href="{% url 'catalog' %}" class="btn btn-gold btn-lg">Discover Products</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% block title %}Checkout — VORN{% endblock %}
+
+{% block content %}
+<div class="page-offset">
+  <div class="page-hero">
+    <span class="label-caps">Secure Checkout</span>
+    <h1 class="heading-lg" style="margin-top:12px;">Complete Your Order</h1>
+  </div>
+
+  <div class="section" style="padding-top:48px;">
+
+    <!-- Progress Steps -->
+    <div class="checkout-steps" style="margin-bottom:48px;max-width:500px;">
+      <div class="checkout-step done">
+        <div class="step-num"><i class="fa fa-check" style="font-size:0.7rem;"></i></div>
+        <span>Bag</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="checkout-step active">
+        <div class="step-num">2</div>
+        <span>Details</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="checkout-step" id="step3">
+        <div class="step-num">3</div>
+        <span>Payment</span>
+      </div>
+    </div>
+
+    <div class="checkout-layout">
+
+      <!-- ─── LEFT: SHIPPING FORM ─────────────────── -->
+      <div>
+        <div class="checkout-section-title">
+          <span class="label-caps" style="display:block;margin-bottom:8px;">Your Details</span>
+          Shipping Information
+        </div>
+
+        <form method="post" action="{% url 'initiate_payment_link' %}" id="checkoutForm" novalidate>
+          {% csrf_token %}
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Full Name *</label>
+              <input type="text" name="full_name" id="full_name" class="form-control" required
+                     value="{{ user.get_full_name|default:'' }}" placeholder="Puran Rai">
+              <div class="form-error" id="err_full_name"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number *</label>
+              <input type="tel" name="phone" id="phone" class="form-control" required
+                     placeholder="+91 98765 43210">
+              <div class="form-error" id="err_phone"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input type="email" name="email" id="email" class="form-control" required
+                   value="{{ user.email|default:'' }}" placeholder="you@example.com">
+            <div class="form-error" id="err_email"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Address Line 1 *</label>
+            <input type="text" name="address_line1" id="address_line1" class="form-control" required
+                   placeholder="House No., Street Name">
+            <div class="form-error" id="err_address_line1"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Address Line 2 <span style="color:var(--gray-400);font-weight:400;">(Optional)</span></label>
+            <input type="text" name="address_line2" class="form-control" placeholder="Landmark, Colony, Area">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">City *</label>
+              <input type="text" name="city" id="city" class="form-control" required placeholder="Mumbai">
+              <div class="form-error" id="err_city"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">State *</label>
+              <input type="text" name="state" id="state" class="form-control" required placeholder="Maharashtra">
+              <div class="form-error" id="err_state"></div>
+            </div>
+          </div>
+
+          <div class="form-group" style="max-width:180px;">
+            <label class="form-label">PIN Code *</label>
+            <input type="text" name="pincode" id="pincode" class="form-control" required
+                   placeholder="400001" maxlength="6" pattern="[0-9]{6}">
+            <div class="form-error" id="err_pincode"></div>
+          </div>
+
+          <!-- Payment Method Preview -->
+          <div style="margin:32px 0;padding:20px 24px;background:var(--black-elevated);border:1px solid var(--black-border);">
+            <div class="label-caps" style="margin-bottom:16px;">Payment Method</div>
+
+            <!-- Razorpay.me (Primary) -->
+            <div style="display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--black-border);">
+              <div style="width:40px;height:40px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;color:var(--black);font-size:1rem;flex-shrink:0;">
+                <i class="fa fa-bolt"></i>
+              </div>
+              <div style="flex:1;">
+                <div style="font-weight:600;margin-bottom:3px;">Razorpay — Cards, UPI, Wallets, Net Banking</div>
+                <div style="font-size:0.75rem;color:var(--gray-400);">Pay instantly via Razorpay secure gateway · <span style="color:var(--gold);">razorpay.me/@puranrai9473</span></div>
+              </div>
+              <i class="fa fa-check-circle" style="color:var(--gold);font-size:1.1rem;"></i>
+            </div>
+
+            <!-- UPI QR badge row -->
+            <div style="display:flex;gap:16px;padding-top:14px;flex-wrap:wrap;">
+              <span style="font-size:0.7rem;color:var(--gray-400);display:flex;align-items:center;gap:6px;"><img src="https://img.icons8.com/color/20/google-pay-india.png" style="height:18px;"> Google Pay</span>
+              <span style="font-size:0.7rem;color:var(--gray-400);display:flex;align-items:center;gap:6px;"><img src="https://img.icons8.com/color/20/phonepe.png" style="height:18px;"> PhonePe</span>
+              <span style="font-size:0.7rem;color:var(--gray-400);display:flex;align-items:center;gap:6px;"><i class="fa fa-credit-card" style="color:var(--gold);"></i> Cards</span>
+              <span style="font-size:0.7rem;color:var(--gray-400);display:flex;align-items:center;gap:6px;"><i class="fa fa-university" style="color:var(--gold);"></i> Net Banking</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-gold btn-full" style="padding:18px;font-size:0.8rem;" id="checkoutBtn">
+            <i class="fa fa-lock"></i>&nbsp; Proceed to Payment · ₹<span id="totalAmtBtn">{{ total }}</span>
+          </button>
+
+          <div class="trust-badges" style="margin-top:16px;flex-wrap:wrap;justify-content:center;">
+            <div class="trust-badge"><i class="fa fa-shield-alt"></i> SSL Encrypted</div>
+            <div class="trust-badge"><i class="fa fa-bolt"></i> Instant Payment</div>
+            <div class="trust-badge"><i class="fa fa-undo"></i> 15-Day Returns</div>
+          </div>
+        </form>
+      </div>
+
+      <!-- ─── RIGHT: ORDER SUMMARY ────────────────── -->
+      <div class="order-box">
+        <div class="order-box-title">Order Summary</div>
+
+        <!-- Items -->
+        {% for item in cart_items %}
+        <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--black-border);">
+          {% if item.image %}
+          <img src="{{ item.image }}" style="width:52px;height:66px;object-fit:cover;flex-shrink:0;" alt="">
+          {% else %}
+          <div style="width:52px;height:66px;background:var(--black-elevated);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <span style="font-size:0.55rem;color:var(--gold);">VORN</span>
+          </div>
+          {% endif %}
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:0.83rem;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ item.name }}</div>
+            <div style="font-size:0.72rem;color:var(--gray-400);">{{ item.size|default:"One Size" }} · Qty {{ item.quantity }}</div>
+          </div>
+          <div style="color:var(--gold);font-size:0.88rem;font-weight:600;flex-shrink:0;">₹{{ item.subtotal }}</div>
+        </div>
+        {% endfor %}
+
+        <!-- Coupon -->
+        <div style="margin:20px 0;padding:16px;border:1px dashed var(--black-border-light);">
+          <div style="font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Coupon Code</div>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="couponInput" placeholder="VORN10, WELCOME20, FLAT500" class="form-control" style="flex:1;font-size:0.82rem;">
+            <button onclick="applyCoupon()" class="btn btn-dark btn-sm" style="flex-shrink:0;padding:10px 16px;">Apply</button>
+          </div>
+          <div id="couponMsg" style="font-size:0.75rem;margin-top:8px;"></div>
+        </div>
+
+        <!-- Totals -->
+        <div class="summary-row">
+          <span class="summary-row-label">Subtotal</span><span>₹{{ subtotal }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-row-label">Shipping</span>
+          <span>{% if shipping == 0 %}<span style="color:var(--success);">Free ✓</span>{% else %}₹{{ shipping }}{% endif %}</span>
+        </div>
+        <div id="discountRow" class="summary-row" style="display:none;">
+          <span style="color:var(--success);">Coupon Discount</span>
+          <span style="color:var(--success);">−₹<span id="discountAmt">0</span></span>
+        </div>
+        <div class="summary-total-row">
+          <span class="summary-total-label">Total</span>
+          <span class="summary-total-amount">₹<span id="totalDisplay">{{ total }}</span></span>
+        </div>
+
+        <!-- Payment provider -->
+        <div style="margin-top:20px;text-align:center;padding:16px;background:var(--black-elevated);border:1px solid var(--black-border);">
+          <div style="font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-500);margin-bottom:10px;">Secured by</div>
+          <div style="font-size:0.9rem;font-weight:700;color:var(--gold);letter-spacing:0.1em;">RAZORPAY</div>
+          <div style="font-size:0.7rem;color:var(--gray-500);margin-top:6px;">razorpay.me/@puranrai9473</div>
+          <div style="display:flex;justify-content:center;gap:12px;margin-top:14px;flex-wrap:wrap;">
+            <i class="fa fa-lock" style="color:var(--gold);font-size:1rem;" title="SSL Encrypted"></i>
+            <i class="fa fa-shield-alt" style="color:var(--gold);font-size:1rem;" title="PCI DSS Compliant"></i>
+            <i class="fa fa-qrcode" style="color:var(--gold);font-size:1rem;" title="UPI Supported"></i>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const baseSubtotal = {{ subtotal }};
+const baseShipping = {{ shipping }};
+let discount = 0;
+
+function applyCoupon() {
+  const code = document.getElementById('couponInput').value.trim().toUpperCase();
+  if (!code) return;
+  const btn = event.target;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+  btn.disabled = true;
+
+  fetch("{% url 'apply_coupon' %}", {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': '{{ csrf_token }}' },
+    body: 'code=' + encodeURIComponent(code),
+  }).then(r => r.json()).then(d => {
+    btn.innerHTML = 'Apply'; btn.disabled = false;
+    const msg = document.getElementById('couponMsg');
+    if (d.success) {
+      discount = d.discount;
+      const newTotal = Math.max(baseSubtotal + baseShipping - discount, 1);
+      document.getElementById('discountAmt').textContent = Math.round(discount);
+      document.getElementById('discountRow').style.display = 'flex';
+      document.getElementById('totalDisplay').textContent = Math.round(newTotal);
+      document.getElementById('totalAmtBtn').textContent = Math.round(newTotal);
+      msg.style.color = 'var(--success)';
+      msg.textContent = '✓ ' + d.code + ' applied — you save ₹' + Math.round(discount);
+    } else {
+      msg.style.color = 'var(--danger)';
+      msg.textContent = d.message || 'Invalid coupon code.';
+    }
+  }).catch(() => { btn.innerHTML = 'Apply'; btn.disabled = false; });
+}
+
+// Client-side form validation
+document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+  const required = ['full_name', 'email', 'phone', 'address_line1', 'city', 'state', 'pincode'];
+  let valid = true;
+  required.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const err = document.getElementById('err_' + id);
+    if (!el.value.trim()) {
+      el.classList.add('error');
+      if (err) err.textContent = 'Required';
+      if (valid) el.focus();
+      valid = false;
+    } else {
+      el.classList.remove('error');
+      if (err) err.textContent = '';
+    }
+  });
+  if (!valid) e.preventDefault();
+  else {
+    const btn = document.getElementById('checkoutBtn');
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Redirecting to Payment…';
+    btn.disabled = true;
+  }
+});
+</script>
+{% endblock %}

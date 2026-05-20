@@ -1,0 +1,379 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ product.name }} — VORN{% endblock %}
+{% block meta_description %}{{ product.short_description|default:product.description|truncatewords:20 }}{% endblock %}
+
+{% block content %}
+<div class="page-offset">
+  <div class="section" style="padding-top: 52px;">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="{% url 'home' %}">Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="{% url 'catalog' %}">Shop</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="{% url 'catalog' %}?category={{ product.category.slug }}">{{ product.category.name }}</a>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--cream);">{{ product.name }}</span>
+    </nav>
+
+    <!-- Detail Layout -->
+    <div class="detail-layout">
+
+      <!-- ─── GALLERY ─────────────────────────────── -->
+      <div>
+        {% if images %}
+        <div class="gallery-wrap" id="gallery">
+          <div class="gallery-thumbs">
+            {% for img in images %}
+            <img src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}"
+                 class="gallery-thumb {% if forloop.first %}active{% endif %}"
+                 onclick="setMain('{{ img.image.url }}', this)">
+            {% endfor %}
+          </div>
+          <div class="gallery-main-wrap" id="mainWrap" onclick="openLightbox()">
+            <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}" class="gallery-main-img" id="mainImage">
+            <div style="position:absolute;bottom:12px;right:12px;background:rgba(8,8,8,0.7);padding:6px 10px;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">
+              <i class="fa fa-search-plus"></i> Zoom
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="gallery-main-wrap" style="aspect-ratio:3/4;">
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--black-elevated);">
+            <span style="font-family:var(--font-heading);font-size:5rem;color:rgba(201,169,110,0.2);">VORN</span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- ─── PRODUCT INFO ───────────────────────── -->
+      <div>
+        <span class="label-caps">{{ product.category.name }}</span>
+        <h1 class="product-title">{{ product.name }}</h1>
+
+        <!-- Rating -->
+        <div class="product-rating">
+          <span class="stars">
+            {% for i in "12345" %}
+            {% if forloop.counter <= avg_rating %}<span>★</span>
+            {% else %}<span class="empty">★</span>{% endif %}
+            {% endfor %}
+          </span>
+          <span class="rating-count">{{ reviews|length }} review{{ reviews|length|pluralize }}</span>
+          <span style="color:var(--black-border);">|</span>
+          <span style="font-size:0.75rem;color:{% if product.stock > 0 %}var(--success){% else %}var(--danger){% endif %};">
+            {% if product.stock > 5 %}In Stock{% elif product.stock > 0 %}Only {{ product.stock }} left{% else %}Out of Stock{% endif %}
+          </span>
+        </div>
+
+        <!-- Price -->
+        <div class="product-price-block">
+          <span class="product-price-main">₹{{ product.price }}</span>
+          {% if product.compare_price %}
+          <span class="product-price-was">₹{{ product.compare_price }}</span>
+          <span class="product-price-off">{{ product.discount_percentage }}% OFF</span>
+          {% endif %}
+        </div>
+
+        <p class="product-desc">{{ product.short_description|default:product.description }}</p>
+
+        <!-- Size Selector -->
+        {% if variants %}
+        <form method="post" action="{% url 'add_to_cart' product.id %}" id="atcForm">
+          {% csrf_token %}
+          <div class="size-header">
+            <span class="label-caps">Select Size</span>
+            <a href="#" class="size-guide-link" onclick="document.getElementById('sizeModal').style.display='flex';return false;">Size Guide</a>
+          </div>
+          <div class="size-grid">
+            {% for v in variants %}
+            <label style="cursor:{% if v.stock == 0 %}not-allowed{% else %}pointer{% endif %}">
+              <input type="radio" name="size" value="{{ v.size }}" style="display:none;"
+                     {% if forloop.first and v.stock > 0 %}checked{% endif %}
+                     {% if v.stock == 0 %}disabled{% endif %}>
+              <div class="size-btn {% if v.stock == 0 %}{% endif %}" title="{% if v.stock == 0 %}Out of stock{% endif %}">
+                {{ v.size }}
+                {% if v.stock == 0 %}<div style="position:absolute;width:100%;height:1px;background:var(--gray-500);top:50%;transform:rotate(-45deg);left:0;"></div>{% endif %}
+              </div>
+            </label>
+            {% endfor %}
+          </div>
+          <input type="hidden" name="quantity" value="1">
+          <div class="atc-row">
+            <button type="submit" class="btn btn-gold" style="flex:1;" {% if product.stock == 0 %}disabled{% endif %}>
+              <i class="fa fa-shopping-bag"></i>
+              {% if product.stock == 0 %}Out of Stock{% else %}Add to Bag{% endif %}
+            </button>
+            <a href="{% url 'toggle_wishlist' product.id %}" class="btn btn-icon" title="{% if product.id in request.session.wishlist %}Remove from Wishlist{% else %}Save to Wishlist{% endif %}">
+              <i class="{% if product.id in request.session.wishlist %}fas text-gold{% else %}far{% endif %} fa-heart"></i>
+            </a>
+          </div>
+        </form>
+        {% else %}
+        <form method="post" action="{% url 'add_to_cart' product.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="quantity" value="1">
+          <div class="atc-row">
+            <button type="submit" class="btn btn-gold" style="flex:1;" {% if product.stock == 0 %}disabled{% endif %}>
+              <i class="fa fa-shopping-bag"></i>
+              {% if product.stock == 0 %}Out of Stock{% else %}Add to Bag{% endif %}
+            </button>
+            <a href="{% url 'toggle_wishlist' product.id %}" class="btn btn-icon" title="Wishlist">
+              <i class="{% if product.id in request.session.wishlist %}fas text-gold{% else %}far{% endif %} fa-heart"></i>
+            </a>
+          </div>
+        </form>
+        {% endif %}
+
+        <!-- Buy Now -->
+        {% if product.stock > 0 %}
+        <form method="post" action="{% url 'add_to_cart' product.id %}" style="margin-top:8px;">
+          {% csrf_token %}
+          <input type="hidden" name="quantity" value="1">
+          {% if variants %}<input type="hidden" name="size" id="buyNowSize" value="{{ variants.0.size }}">{% endif %}
+          <button type="submit" formaction="{% url 'checkout' %}" onclick="this.form.action='{% url 'add_to_cart' product.id %}'" class="btn btn-outline btn-full"
+                  style="margin-top:0;"
+                  formmethod="post">
+            ⚡ Buy Now
+          </button>
+        </form>
+        {% endif %}
+
+        <!-- Delivery badge -->
+        <div style="display:flex;gap:20px;margin:24px 0;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.75rem;color:var(--gray-400);">
+            <i class="fa fa-truck" style="color:var(--gold);"></i> Free Delivery above ₹999
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.75rem;color:var(--gray-400);">
+            <i class="fa fa-undo" style="color:var(--gold);"></i> 15-Day Easy Returns
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.75rem;color:var(--gray-400);">
+            <i class="fa fa-shield-alt" style="color:var(--gold);"></i> Genuine Product
+          </div>
+        </div>
+
+        <!-- Accordions -->
+        <div style="border-top:1px solid var(--black-border);">
+          {% if product.description %}
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              Description <i class="fa fa-plus"></i>
+            </button>
+            <div class="accordion-body">{{ product.description }}</div>
+          </div>
+          {% endif %}
+          {% if product.material %}
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              Material & Composition <i class="fa fa-plus"></i>
+            </button>
+            <div class="accordion-body">{{ product.material }}</div>
+          </div>
+          {% endif %}
+          {% if product.care_instructions %}
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              Care Instructions <i class="fa fa-plus"></i>
+            </button>
+            <div class="accordion-body">{{ product.care_instructions }}</div>
+          </div>
+          {% endif %}
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              Shipping &amp; Returns <i class="fa fa-plus"></i>
+            </button>
+            <div class="accordion-body">
+              Free shipping on orders above ₹999. Standard delivery 3–5 business days.<br>
+              Returns accepted within 15 days of delivery. Items must be unworn, with tags.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── REVIEWS ────────────────────────────── -->
+    <div style="margin-top:80px;padding-top:64px;border-top:1px solid var(--black-border);">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:40px;flex-wrap:wrap;gap:16px;">
+        <h2 class="heading-md">Customer Reviews</h2>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="stars" style="font-size:1.1rem;">
+            {% for i in "12345" %}{% if forloop.counter <= avg_rating %}★{% else %}<span class="empty">★</span>{% endif %}{% endfor %}
+          </span>
+          <span style="font-family:var(--font-heading);font-size:1.5rem;color:var(--gold);">{{ avg_rating|floatformat:1 }}</span>
+          <span style="color:var(--gray-400);font-size:0.8rem;">/ 5.0 · {{ reviews|length }} reviews</span>
+        </div>
+      </div>
+
+      {% if reviews %}
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-bottom:48px;">
+        {% for r in reviews %}
+        <div style="background:var(--black-card);border:1px solid var(--black-border);padding:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+            <div>
+              <div class="stars" style="font-size:0.85rem;margin-bottom:4px;">
+                {% for i in "12345" %}{% if forloop.counter <= r.rating %}★{% else %}<span class="empty">★</span>{% endif %}{% endfor %}
+              </div>
+              <h4 style="font-family:var(--font-heading);font-size:1.05rem;">{{ r.title }}</h4>
+            </div>
+            {% if r.is_verified %}<span style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--success);border:1px solid var(--success);padding:3px 8px;">✓ Verified</span>{% endif %}
+          </div>
+          <p style="color:var(--gray-400);font-size:0.85rem;line-height:1.75;">{{ r.body }}</p>
+          <p style="color:var(--gray-500);font-size:0.72rem;margin-top:14px;">— {{ r.user.get_full_name|default:r.user.username }} · {{ r.created_at|date:"M Y" }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p style="color:var(--gray-400);margin-bottom:40px;">Be the first to review this product.</p>
+      {% endif %}
+
+      <!-- Review Form -->
+      {% if user.is_authenticated and not user_review %}
+      <div style="background:var(--black-card);border:1px solid var(--black-border);padding:36px;max-width:600px;">
+        <h3 style="font-family:var(--font-heading);font-size:1.6rem;margin-bottom:24px;">Write a Review</h3>
+        <form method="post" action="{% url 'submit_review' product.id %}">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-label">Your Rating</label>
+            <div style="display:flex;gap:8px;margin-top:4px;" id="starRating">
+              {% for i in "12345" %}
+              <label style="cursor:pointer;font-size:1.8rem;color:var(--black-border);transition:color 0.1s;" class="star-label" data-val="{{ i }}">★</label>
+              {% endfor %}
+              <input type="hidden" name="rating" id="ratingInput" value="5" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Review Title</label>
+            <input type="text" name="title" class="form-control" placeholder="Summarise your experience" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Your Review</label>
+            <textarea name="body" rows="4" class="form-control" placeholder="Tell others what you think about this product…" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-gold"><i class="fa fa-paper-plane"></i> Submit Review</button>
+        </form>
+      </div>
+      {% elif not user.is_authenticated %}
+      <div class="alert alert-info" style="max-width:500px;">
+        <i class="fa fa-info-circle"></i>
+        <span><a href="{% url 'login' %}?next={{ request.path }}" style="color:var(--gold);text-decoration:underline;">Login</a> to leave a review for this product.</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ─── RELATED ─────────────────────────────── -->
+    {% if related %}
+    <div style="margin-top:80px;padding-top:64px;border-top:1px solid var(--black-border);">
+      <div class="section-header" style="text-align:left;margin-bottom:32px;">
+        <span class="label-caps">You May Also Like</span>
+      </div>
+      <div class="product-grid">
+        {% for p in related %}{% include 'store/_product_card.html' with product=p %}{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<!-- Size Guide Modal -->
+<div id="sizeModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:var(--black-card);border:1px solid var(--black-border);padding:40px;max-width:500px;width:90%;position:relative;">
+    <button onclick="document.getElementById('sizeModal').style.display='none'" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--gray-400);font-size:1.2rem;cursor:pointer;">×</button>
+    <h3 style="font-family:var(--font-heading);font-size:1.8rem;margin-bottom:24px;">Size Guide</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--black-border);">
+          <th style="padding:10px;text-align:left;color:var(--gold);font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;">Size</th>
+          <th style="padding:10px;text-align:center;color:var(--gold);font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;">Chest (in)</th>
+          <th style="padding:10px;text-align:center;color:var(--gold);font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;">Waist (in)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in "12345" %}
+        <tr style="border-bottom:1px solid var(--black-border);">
+          {% if forloop.counter == 1 %}<td style="padding:10px;">XS</td><td style="padding:10px;text-align:center;">34</td><td style="padding:10px;text-align:center;">28</td>{% endif %}
+          {% if forloop.counter == 2 %}<td style="padding:10px;">S</td><td style="padding:10px;text-align:center;">36</td><td style="padding:10px;text-align:center;">30</td>{% endif %}
+          {% if forloop.counter == 3 %}<td style="padding:10px;">M</td><td style="padding:10px;text-align:center;">38</td><td style="padding:10px;text-align:center;">32</td>{% endif %}
+          {% if forloop.counter == 4 %}<td style="padding:10px;">L</td><td style="padding:10px;text-align:center;">40</td><td style="padding:10px;text-align:center;">34</td>{% endif %}
+          {% if forloop.counter == 5 %}<td style="padding:10px;">XL</td><td style="padding:10px;text-align:center;">42</td><td style="padding:10px;text-align:center;">36</td>{% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.95);align-items:center;justify-content:center;" onclick="if(event.target===this||event.target.id==='lightbox')closeLightbox()">
+  <img id="lightboxImg" src="" alt="" style="max-width:90vw;max-height:90vh;object-fit:contain;">
+  <button onclick="closeLightbox()" style="position:fixed;top:20px;right:24px;background:none;border:none;color:var(--cream);font-size:2rem;cursor:pointer;">×</button>
+</div>
+
+<script>
+// Gallery
+function setMain(url, el) {
+  document.getElementById('mainImage').src = url;
+  document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Lightbox
+function openLightbox() {
+  const src = document.getElementById('mainImage').src;
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); });
+
+// Size selector
+document.querySelectorAll('input[name="size"]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+    r.closest('label').querySelector('.size-btn').classList.add('selected');
+  });
+});
+// Select first available size
+const firstAvail = document.querySelector('input[name="size"]:not([disabled])');
+if (firstAvail) {
+  firstAvail.closest('label').querySelector('.size-btn').classList.add('selected');
+}
+
+// Star rating UI
+const stars = document.querySelectorAll('.star-label');
+stars.forEach((s, idx) => {
+  s.addEventListener('mouseover', () => {
+    stars.forEach((st, i) => st.style.color = i <= idx ? 'var(--gold)' : 'var(--black-border)');
+  });
+  s.addEventListener('click', () => {
+    document.getElementById('ratingInput').value = s.dataset.val;
+    stars.forEach((st, i) => st.style.color = i <= idx ? 'var(--gold)' : 'var(--black-border)');
+  });
+});
+// Init stars
+if (stars.length) {
+  const val = parseInt(document.getElementById('ratingInput')?.value || 5);
+  stars.forEach((s, i) => s.style.color = i < val ? 'var(--gold)' : 'var(--black-border)');
+}
+document.getElementById('starRating')?.addEventListener('mouseleave', () => {
+  const val = parseInt(document.getElementById('ratingInput')?.value || 5);
+  stars.forEach((s, i) => s.style.color = i < val ? 'var(--gold)' : 'var(--black-border)');
+});
+
+// Accordion
+function toggleAccordion(btn) {
+  const body = btn.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.accordion-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.accordion-trigger').forEach(b => b.classList.remove('open'));
+  if (!isOpen) { body.classList.add('open'); btn.classList.add('open'); }
+}
+</script>
+{% endblock %}

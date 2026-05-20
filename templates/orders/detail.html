@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Order #{{ order.order_number }} — VORN{% endblock %}
+
+{% block content %}
+<div class="page-offset">
+  <div class="section" style="padding-top:52px;">
+    <nav class="breadcrumb">
+      <a href="{% url 'home' %}">Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="{% url 'order_history' %}">My Orders</a>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--cream);">#{{ order.order_number }}</span>
+    </nav>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:40px;flex-wrap:wrap;gap:16px;">
+      <div>
+        <span class="label-caps" style="display:block;margin-bottom:8px;">Order Details</span>
+        <h1 style="font-family:var(--font-heading);font-size:2.2rem;">#{{ order.order_number }}</h1>
+        <div style="font-size:0.8rem;color:var(--gray-400);margin-top:6px;">Placed on {{ order.created_at|date:"d M Y" }} at {{ order.created_at|time:"g:i A" }}</div>
+      </div>
+      <span class="order-status status-{{ order.status }}" style="padding:8px 20px;">{{ order.get_status_display }}</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 360px;gap:32px;align-items:start;">
+      <div>
+        <!-- Items -->
+        <div style="background:var(--black-card);border:1px solid var(--black-border);margin-bottom:24px;">
+          <div style="padding:20px 24px;border-bottom:1px solid var(--black-border);">
+            <span class="label-caps">Items Ordered</span>
+          </div>
+          {% for item in order.items.all %}
+          <div style="display:flex;gap:16px;padding:20px 24px;border-bottom:1px solid var(--black-border);align-items:center;">
+            {% if item.product and item.product.primary_image %}
+            <img src="{{ item.product.primary_image.image.url }}" style="width:64px;height:80px;object-fit:cover;flex-shrink:0;" alt="">
+            {% else %}
+            <div style="width:64px;height:80px;background:var(--black-elevated);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <span style="font-size:0.6rem;color:var(--gold);">VORN</span>
+            </div>
+            {% endif %}
+            <div style="flex:1;">
+              <div style="font-family:var(--font-heading);font-size:1.05rem;margin-bottom:4px;">{{ item.product_name }}</div>
+              <div style="font-size:0.75rem;color:var(--gray-400);">Size: {{ item.size|default:"—" }} · Qty: {{ item.quantity }}</div>
+              <div style="font-size:0.78rem;color:var(--gray-400);margin-top:4px;">₹{{ item.price }} each</div>
+            </div>
+            <div style="font-family:var(--font-heading);font-size:1.2rem;color:var(--gold);">₹{{ item.subtotal }}</div>
+          </div>
+          {% endfor %}
+          <div style="padding:20px 24px;display:flex;justify-content:space-between;align-items:center;">
+            <span class="label-caps">Order Total</span>
+            <span style="font-family:var(--font-heading);font-size:1.8rem;color:var(--gold);">₹{{ order.total }}</span>
+          </div>
+        </div>
+
+        <!-- Shipping Address -->
+        <div style="background:var(--black-card);border:1px solid var(--black-border);padding:24px;">
+          <div class="label-caps" style="margin-bottom:16px;">Shipping Address</div>
+          <p style="font-size:0.88rem;line-height:1.9;color:var(--gray-400);">
+            <strong style="color:var(--cream);">{{ order.full_name }}</strong><br>
+            {{ order.address_line1 }}<br>
+            {% if order.address_line2 %}{{ order.address_line2 }}<br>{% endif %}
+            {{ order.city }}, {{ order.state }} — {{ order.pincode }}<br>
+            <i class="fa fa-phone" style="color:var(--gold);width:16px;"></i> {{ order.phone }}<br>
+            <i class="fa fa-envelope" style="color:var(--gold);width:16px;"></i> {{ order.email }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="order-box" style="position:sticky;top:120px;">
+        <div class="order-box-title">Payment Summary</div>
+        <div class="summary-row">
+          <span class="summary-row-label">Subtotal</span><span>₹{{ order.subtotal }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-row-label">Shipping</span>
+          <span>{% if order.shipping_charge == 0 %}<span style="color:var(--success);">Free</span>{% else %}₹{{ order.shipping_charge }}{% endif %}</span>
+        </div>
+        {% if order.discount %}
+        <div class="summary-row">
+          <span class="summary-row-label" style="color:var(--success);">Discount</span>
+          <span style="color:var(--success);">−₹{{ order.discount }}</span>
+        </div>
+        {% endif %}
+        <div class="summary-total-row">
+          <span class="summary-total-label">Total Paid</span>
+          <span class="summary-total-amount">₹{{ order.total }}</span>
+        </div>
+
+        <div style="margin-top:20px;padding:16px;border:1px solid var(--black-border);">
+          <div class="label-caps" style="margin-bottom:10px;">Payment Status</div>
+          {% if order.is_paid %}
+          <div style="display:flex;align-items:center;gap:8px;color:var(--success);">
+            <i class="fa fa-check-circle"></i>
+            <span style="font-size:0.85rem;">Payment Confirmed</span>
+          </div>
+          {% if order.razorpay_payment_id %}
+          <div style="font-size:0.72rem;color:var(--gray-500);margin-top:6px;">ID: {{ order.razorpay_payment_id }}</div>
+          {% endif %}
+          {% else %}
+          <div style="display:flex;align-items:center;gap:8px;color:#FFA726;">
+            <i class="fa fa-clock"></i>
+            <span style="font-size:0.85rem;">Awaiting Verification</span>
+          </div>
+          {% endif %}
+        </div>
+
+        <a href="{% url 'order_history' %}" class="btn btn-ghost btn-full btn-sm" style="margin-top:16px;">← Back to Orders</a>
+        <a href="{% url 'catalog' %}" class="btn btn-gold btn-full btn-sm" style="margin-top:8px;">Continue Shopping</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+@media (max-width:900px) {
+  .page-offset .section > div[style*="grid-template-columns:1fr 360px"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Search{% if query %}: {{ query }}{% endif %} — VORN{% endblock %}
+
+{% block content %}
+<div class="page-offset">
+  <div class="page-hero">
+    <span class="label-caps">Search</span>
+    <h1 class="heading-lg" style="margin-top:12px;">
+      {% if query %}Results for "<em style="color:var(--gold);">{{ query }}</em>"
+      {% else %}Find Your Piece{% endif %}
+    </h1>
+    {% if query and products %}
+    <p style="color:var(--gray-400);margin-top:12px;font-size:0.9rem;">{{ products|length }} result{{ products|length|pluralize }}</p>
+    {% endif %}
+  </div>
+
+  <div class="section" style="padding-top:48px;">
+    <form action="{% url 'search' %}" method="get" style="display:flex;gap:0;max-width:600px;margin:0 auto 60px;">
+      <input type="text" name="q" value="{{ query }}" placeholder="Search shirts, overcoat, cashmere…"
+             class="form-control" style="flex:1;font-size:1rem;border-right:none;padding:16px 20px;" autofocus>
+      <button type="submit" class="btn btn-gold" style="flex-shrink:0;border-radius:0;padding:16px 28px;font-size:0.85rem;">
+        <i class="fa fa-search"></i>
+      </button>
+    </form>
+
+    {% if query %}
+      {% if products %}
+      <div class="product-grid">
+        {% for p in products %}{% include 'store/_product_card.html' with product=p %}{% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon"><i class="fa fa-search"></i></div>
+        <h2>No results found</h2>
+        <p>Try different keywords, or browse our collections.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px;">
+          <a href="{% url 'catalog' %}" class="btn btn-gold">Browse All</a>
+          <a href="{% url 'catalog' %}?is_new=1" class="btn btn-outline">New Arrivals</a>
+        </div>
+      </div>
+      {% endif %}
+    {% else %}
+    <!-- Suggested searches -->
+    <div style="text-align:center;margin-top:0;">
+      <div class="label-caps" style="margin-bottom:20px;">Popular Searches</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
+        {% for term in "Oxford Shirt,Overcoat,Merino,Trousers,Chelsea Boot,Linen,Wallet,Pocket Square"|split:"," %}
+        <a href="{% url 'search' %}?q={{ term }}" class="filter-pill" style="font-size:0.72rem;">{{ term }}</a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

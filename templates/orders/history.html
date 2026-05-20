@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}My Orders — VORN{% endblock %}
+
+{% block content %}
+<div class="page-offset">
+  <div class="page-hero">
+    <span class="label-caps">Account</span>
+    <h1 class="heading-lg" style="margin-top:12px;">Order History</h1>
+  </div>
+  <div class="section" style="padding-top:48px;">
+    {% if orders %}
+    <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <span style="color:var(--gray-400);font-size:0.85rem;">{{ orders|length }} order{{ orders|length|pluralize }}</span>
+      <a href="{% url 'catalog' %}" class="btn btn-ghost btn-sm">Continue Shopping</a>
+    </div>
+    {% for order in orders %}
+    <div class="order-card">
+      <div class="order-card-header">
+        <div>
+          <div class="order-num">#{{ order.order_number }}</div>
+          <div style="font-size:0.75rem;color:var(--gray-400);margin-top:4px;">{{ order.created_at|date:"d M Y, g:i A" }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+          <span style="font-family:var(--font-heading);font-size:1.2rem;color:var(--gold);">₹{{ order.total }}</span>
+          {% if order.is_paid %}
+          <span style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--success);border:1px solid var(--success);padding:3px 8px;">✓ Paid</span>
+          {% else %}
+          <span style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:#FFA726;border:1px solid #FFA726;padding:3px 8px;">Pending</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="order-card-body">
+        <div class="order-items-row">
+          {% for item in order.items.all %}
+          {% if item.product and item.product.primary_image %}
+          <img src="{{ item.product.primary_image.image.url }}" alt="{{ item.product_name }}" class="order-item-thumb" title="{{ item.product_name }}">
+          {% else %}
+          <div class="order-item-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--black-elevated);">
+            <span style="font-size:0.55rem;color:var(--gold);">VORN</span>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+        <div class="order-meta">
+          <span>{{ order.items.count }} item{{ order.items.count|pluralize }}</span>
+          <span>Ship to: <strong>{{ order.city }}, {{ order.state }}</strong></span>
+          <span>{{ order.full_name }}</span>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="{% url 'order_detail' order.order_number %}" class="btn btn-ghost btn-sm">View Details</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="fa fa-box-open"></i></div>
+      <h2>No orders yet</h2>
+      <p>Your order history will appear here once you make a purchase.</p>
+      <a href="{% url 'catalog' %}" class="btn btn-gold btn-lg">Start Shopping</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
