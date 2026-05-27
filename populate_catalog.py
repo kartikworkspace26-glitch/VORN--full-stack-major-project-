@@ -24,6 +24,8 @@ ARTIFACT_DIRS = [
     r"C:\Users\puran\.gemini\antigravity-ide\brain\53629429-e16e-42be-8fd0-90d0f57017aa",
     r"C:\Users\puran\.gemini\antigravity-ide\brain\24db8a02-57f5-4a9f-8ee2-717fe738c102"
 ]
+STATIC_PRODUCTS_DIR = os.path.join(BASE_DIR, 'static', 'images', 'products')
+
 
 # Import image generator fallback
 try:
@@ -314,17 +316,25 @@ def seed_database():
         unique_img_name = f"product_{slug}.png"
         dest_path = os.path.join(PRODUCTS_MEDIA_DIR, unique_img_name)
         
-        # 1. Determine image source from Gemini artifacts
+        # 1. Determine image source from static/images/products first, then artifacts
         src_path = None
         if base_filename:
-            for d in ARTIFACT_DIRS:
-                p_path = os.path.join(d, base_filename)
-                if os.path.exists(p_path):
-                    src_path = p_path
-                    break
+            # Check the tracked static images folder (guaranteed to be on GitHub/Render)
+            static_cand = os.path.join(STATIC_PRODUCTS_DIR, base_filename)
+            if os.path.exists(static_cand):
+                src_path = static_cand
+            else:
+                # Fallback to local developer artifact directories
+                for d in ARTIFACT_DIRS:
+                    p_path = os.path.join(d, base_filename)
+                    if os.path.exists(p_path):
+                        src_path = p_path
+                        break
         
         # 2. Check for local high-quality AI images (.jpg/.png) matching slug/category
         local_candidates = [
+            os.path.join(STATIC_PRODUCTS_DIR, f"{slug}.jpg"),
+            os.path.join(STATIC_PRODUCTS_DIR, f"{slug}.png"),
             os.path.join(PRODUCTS_MEDIA_DIR, f"{slug}.jpg"),
             os.path.join(PRODUCTS_MEDIA_DIR, f"{slug}.png"),
         ]
@@ -332,48 +342,84 @@ def seed_database():
         # Category specific gorgeous AI templates in directory
         if cat_slug == 'footwear':
             if p.get('gender') == 'W':
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'footwear_women.png'))
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'footwear_women.jpg'))
+                local_candidates.extend([
+                    os.path.join(STATIC_PRODUCTS_DIR, 'footwear_women.png'),
+                    os.path.join(STATIC_PRODUCTS_DIR, 'footwear_women.jpg'),
+                    os.path.join(PRODUCTS_MEDIA_DIR, 'footwear_women.png')
+                ])
             else:
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'footwear_men.png'))
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'footwear_men.jpg'))
+                local_candidates.extend([
+                    os.path.join(STATIC_PRODUCTS_DIR, 'footwear_men.png'),
+                    os.path.join(STATIC_PRODUCTS_DIR, 'footwear_men.jpg'),
+                    os.path.join(PRODUCTS_MEDIA_DIR, 'footwear_men.png')
+                ])
         elif cat_slug == 'accessories':
             if p.get('gender') == 'W':
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'accessories_women.png'))
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'accessories_women.jpg'))
+                local_candidates.extend([
+                    os.path.join(STATIC_PRODUCTS_DIR, 'accessories_women.png'),
+                    os.path.join(STATIC_PRODUCTS_DIR, 'accessories_women.jpg'),
+                    os.path.join(PRODUCTS_MEDIA_DIR, 'accessories_women.png')
+                ])
             else:
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'accessories_men.png'))
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'accessories_men.jpg'))
+                local_candidates.extend([
+                    os.path.join(STATIC_PRODUCTS_DIR, 'accessories_men.png'),
+                    os.path.join(STATIC_PRODUCTS_DIR, 'accessories_men.jpg'),
+                    os.path.join(PRODUCTS_MEDIA_DIR, 'accessories_men.png')
+                ])
         elif cat_slug == 'outerwear':
             if p.get('gender') == 'W':
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'outerwear_women.png'))
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'outerwear_women.jpg'))
+                local_candidates.extend([
+                    os.path.join(STATIC_PRODUCTS_DIR, 'outerwear_women.png'),
+                    os.path.join(STATIC_PRODUCTS_DIR, 'outerwear_women.jpg'),
+                    os.path.join(PRODUCTS_MEDIA_DIR, 'outerwear_women.png')
+                ])
             else:
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'outerwear_men.png'))
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'outerwear_men.jpg'))
+                local_candidates.extend([
+                    os.path.join(STATIC_PRODUCTS_DIR, 'outerwear_men.png'),
+                    os.path.join(STATIC_PRODUCTS_DIR, 'outerwear_men.jpg'),
+                    os.path.join(PRODUCTS_MEDIA_DIR, 'outerwear_men.png')
+                ])
         elif cat_slug == 'knitwear':
             if p.get('gender') == 'W':
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'knitwear_women.png'))
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'knitwear_women.jpg'))
+                local_candidates.extend([
+                    os.path.join(STATIC_PRODUCTS_DIR, 'knitwear_women.png'),
+                    os.path.join(STATIC_PRODUCTS_DIR, 'knitwear_women.jpg'),
+                    os.path.join(PRODUCTS_MEDIA_DIR, 'knitwear_women.png')
+                ])
             else:
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'knitwear_men.png'))
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'knitwear_men.jpg'))
+                local_candidates.extend([
+                    os.path.join(STATIC_PRODUCTS_DIR, 'knitwear_men.png'),
+                    os.path.join(STATIC_PRODUCTS_DIR, 'knitwear_men.jpg'),
+                    os.path.join(PRODUCTS_MEDIA_DIR, 'knitwear_men.png')
+                ])
         elif cat_slug == 'shirts' or cat_slug == 'tops':
             if p.get('gender') == 'W':
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'shirt_women.png'))
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'shirt_women.jpg'))
+                local_candidates.extend([
+                    os.path.join(STATIC_PRODUCTS_DIR, 'shirt_women.png'),
+                    os.path.join(STATIC_PRODUCTS_DIR, 'shirt_women.jpg'),
+                    os.path.join(PRODUCTS_MEDIA_DIR, 'shirt_women.png')
+                ])
             else:
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'shirt_men.png'))
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'shirt_men.jpg'))
+                local_candidates.extend([
+                    os.path.join(STATIC_PRODUCTS_DIR, 'shirt_men.png'),
+                    os.path.join(STATIC_PRODUCTS_DIR, 'shirt_men.jpg'),
+                    os.path.join(PRODUCTS_MEDIA_DIR, 'shirt_men.png')
+                ])
         elif cat_slug == 'trousers':
             if p.get('gender') == 'W':
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'trouser_women.png'))
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'trouser_women.jpg'))
+                local_candidates.extend([
+                    os.path.join(STATIC_PRODUCTS_DIR, 'trouser_women.png'),
+                    os.path.join(STATIC_PRODUCTS_DIR, 'trouser_women.jpg'),
+                    os.path.join(PRODUCTS_MEDIA_DIR, 'trouser_women.png')
+                ])
             else:
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'trouser_men.png'))
-                local_candidates.append(os.path.join(PRODUCTS_MEDIA_DIR, 'trouser_men.jpg'))
+                local_candidates.extend([
+                    os.path.join(STATIC_PRODUCTS_DIR, 'trouser_men.png'),
+                    os.path.join(STATIC_PRODUCTS_DIR, 'trouser_men.jpg'),
+                    os.path.join(PRODUCTS_MEDIA_DIR, 'trouser_men.png')
+                ])
         
-        # Select first matching local candidate if no artifact source is resolved
+        # Select first matching candidate
         if not src_path:
             for cand in local_candidates:
                 if cand and os.path.exists(cand):
