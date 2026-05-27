@@ -1,42 +1,311 @@
 {% extends 'base.html' %}
-{% block title %}My Profile — VORN{% endblock %}
+{% load static %}
+{% block title %}My Portal — VORN{% endblock %}
+
 {% block content %}
-<div class="page-top">
+<div class="page-offset">
   <div class="page-hero">
     <span class="label-caps">My Account</span>
-    <h1 class="heading-lg" style="margin-top:12px;">Profile</h1>
+    <h1 class="heading-lg" style="margin-top:12px;">Dashboard</h1>
   </div>
-  <div class="section" style="padding-top:40px;max-width:700px;">
-    <div style="background:var(--black-card);border:1px solid var(--black-border);padding:40px;margin-bottom:24px;">
-      <h3 style="font-family:var(--font-heading);font-size:1.5rem;margin-bottom:28px;">Personal Information</h3>
-      <form method="post">
-        {% csrf_token %}
-        <div class="form-grid">
-          <div class="form-group">
-            <label class="form-label">First Name</label>
-            <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
+
+  <div class="section" style="padding-top:24px;">
+    <div class="profile-layout">
+      
+      <!-- ─── SIDEBAR NAVIGATION ─── -->
+      <aside class="profile-sidebar">
+        <div class="profile-avatar-section">
+          <div class="profile-avatar">
+            {{ profile.initials }}
           </div>
-          <div class="form-group">
-            <label class="form-label">Last Name</label>
-            <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
+          <div class="profile-display-name">{{ profile.display_name }}</div>
+          <div class="profile-email">{{ user.email }}</div>
+          <div class="profile-loyalty">
+            <i class="fa fa-star"></i> VORN Tier: Elite
           </div>
+        </div>
+        <nav class="profile-nav">
+          <a href="?tab=profile" class="profile-nav-item {% if tab == 'profile' %}active{% endif %}">
+            <i class="fa fa-circle-user"></i> Personal Details
+          </a>
+          <a href="?tab=orders" class="profile-nav-item {% if tab == 'orders' %}active{% endif %}">
+            <i class="fa fa-shopping-bag"></i> My Orders
+          </a>
+          <a href="?tab=wishlist" class="profile-nav-item {% if tab == 'wishlist' %}active{% endif %}">
+            <i class="fa fa-heart"></i> My Wishlist
+          </a>
+          <a href="?tab=addresses" class="profile-nav-item {% if tab == 'addresses' %}active{% endif %}">
+            <i class="fa fa-map-marker-alt"></i> Saved Addresses
+          </a>
+          <a href="?tab=security" class="profile-nav-item {% if tab == 'security' %}active{% endif %}">
+            <i class="fa fa-shield-halved"></i> Change Password
+          </a>
+          <a href="{% url 'logout' %}" class="profile-nav-item" style="border-top:1px solid var(--black-border-light);color:var(--danger);">
+            <i class="fa fa-sign-out-alt"></i> Sign Out
+          </a>
+        </nav>
+      </aside>
+
+      <!-- ─── RIGHT CONTENT PANELS ─── -->
+      <main class="profile-content">
+        
+        <!-- Tab: Personal Details -->
+        {% if tab == 'profile' %}
+        <div class="profile-card">
+          <h2 class="profile-card-title">Personal Details</h2>
+          <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_profile">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}" required>
+              </div>
+            </div>
+            <div class="form-grid" style="margin-top:16px;">
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="text" name="phone" class="form-control" value="{{ profile.phone }}" placeholder="+91 ...">
+              </div>
+            </div>
+            <div class="form-grid" style="margin-top:16px;">
+              <div class="form-group">
+                <label class="form-label">Gender</label>
+                <select name="gender" class="form-control">
+                  <option value="" {% if not profile.gender %}selected{% endif %}>Prefer not to say</option>
+                  <option value="M" {% if profile.gender == 'M' %}selected{% endif %}>Male</option>
+                  <option value="F" {% if profile.gender == 'F' %}selected{% endif %}>Female</option>
+                  <option value="O" {% if profile.gender == 'O' %}selected{% endif %}>Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Date of Birth</label>
+                <input type="date" name="date_of_birth" class="form-control" value="{{ profile.date_of_birth|date:'Y-m-d' }}">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-gold" style="margin-top:32px;">Save Changes</button>
+          </form>
+        </div>
+        {% endif %}
+
+        <!-- Tab: Orders History -->
+        {% if tab == 'orders' %}
+        <div class="profile-card">
+          <h2 class="profile-card-title">Order History</h2>
+          {% if recent_orders %}
+            <p style="color:var(--gray-400);font-size:0.8rem;margin-bottom:24px;">Displaying {{ recent_orders|length }} order{{ recent_orders|length|pluralize }} placed under your account.</p>
+            <div style="display:flex;flex-direction:column;gap:20px;">
+              {% for order in recent_orders %}
+              <div class="order-card" style="border:1px solid var(--black-border);background:var(--black-soft);margin-bottom:0;">
+                <div class="order-card-header" style="background:var(--black-elevated);border-bottom:1px solid var(--black-border);display:flex;justify-content:space-between;align-items:center;padding:16px 20px;flex-wrap:wrap;gap:12px;">
+                  <div>
+                    <span style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-500);display:block;">Order Number</span>
+                    <strong style="font-family:var(--font-heading);font-size:1.15rem;color:var(--white);">#{{ order.order_number }}</strong>
+                  </div>
+                  <div>
+                    <span style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-500);display:block;">Date</span>
+                    <span style="font-size:0.75rem;color:var(--cream);">{{ order.created_at|date:"d M Y" }}</span>
+                  </div>
+                  <div>
+                    <span style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-500);display:block;">Status</span>
+                    <span class="order-status status-{{ order.status }}" style="font-size:0.62rem;padding:3px 8px;border-radius:0;">{{ order.get_status_display }}</span>
+                  </div>
+                  <div>
+                    <span style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-500);display:block;">Total</span>
+                    <strong style="color:var(--gold);font-size:1rem;">₹{{ order.total }}</strong>
+                  </div>
+                </div>
+                <div class="order-card-body" style="padding:20px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                      {% for item in order.items.all %}
+                        {% if item.product and item.product.primary_image %}
+                          <img src="{{ item.product.primary_image.image.url }}" alt="{{ item.product_name }}" style="width:48px;height:60px;object-fit:cover;border:1px solid var(--black-border-light);" title="{{ item.product_name }}">
+                        {% else %}
+                          <div style="width:48px;height:60px;display:flex;align-items:center;justify-content:center;background:var(--black-elevated);border:1px solid var(--black-border-light);">
+                            <span style="font-size:0.5rem;color:var(--gold);">VORN</span>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                    <div style="display:flex;gap:10px;">
+                      <a href="{% url 'order_detail' order.order_number %}" class="btn btn-outline btn-sm">Details</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state" style="padding:48px 0;">
+              <div class="empty-state-icon" style="font-size:2.5rem;color:var(--gold);opacity:0.6;"><i class="fa fa-box-open"></i></div>
+              <h3 style="font-family:var(--font-heading);font-size:1.3rem;margin-top:16px;">No orders found</h3>
+              <p style="font-size:0.82rem;color:var(--gray-400);margin-bottom:24px;">You haven't placed any orders yet.</p>
+              <a href="{% url 'catalog' %}" class="btn btn-gold btn-sm">Explore Collection</a>
+            </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Tab: Wishlist -->
+        {% if tab == 'wishlist' %}
+        <div class="profile-card">
+          <h2 class="profile-card-title">My Wishlist</h2>
+          {% if wishlist_items %}
+            <p style="color:var(--gray-400);font-size:0.8rem;margin-bottom:24px;">You have {{ wishlist_items|length }} item{{ wishlist_items|length|pluralize }} saved in your curation.</p>
+            <div class="product-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+              {% for item in wishlist_items %}
+                {% include 'store/_product_card.html' with product=item.product %}
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state" style="padding:48px 0;">
+              <div class="empty-state-icon" style="font-size:2.5rem;color:var(--gold);opacity:0.6;"><i class="far fa-heart"></i></div>
+              <h3 style="font-family:var(--font-heading);font-size:1.3rem;margin-top:16px;">Your curation is empty</h3>
+              <p style="font-size:0.82rem;color:var(--gray-400);margin-bottom:24px;">Explore our catalog and click the heart icon to save products.</p>
+              <a href="{% url 'catalog' %}" class="btn btn-gold btn-sm">Browse Products</a>
+            </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Tab: Saved Addresses -->
+        {% if tab == 'addresses' %}
+        <div class="profile-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid var(--black-border);padding-bottom:16px;">
+            <h2 class="profile-card-title" style="margin-bottom:0;padding-bottom:0;border-bottom:none;">Address Book</h2>
+            <button class="btn btn-gold btn-sm" onclick="document.getElementById('addressModal').style.display='flex'">+ Add New</button>
+          </div>
+          
+          {% if addresses %}
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px;">
+              {% for addr in addresses %}
+              <div style="border:1px solid var(--black-border);padding:20px;background:var(--black-soft);position:relative;">
+                {% if addr.is_default %}
+                  <span style="position:absolute;top:16px;right:16px;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);background:var(--gold-muted);border:1px solid var(--gold);padding:2px 8px;font-weight:600;">Default</span>
+                {% endif %}
+                <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);margin-bottom:4px;">{{ addr.get_label_display }} Address</div>
+                <strong style="display:block;font-size:0.9rem;margin-bottom:8px;color:var(--white);">{{ addr.full_name }}</strong>
+                <p style="font-size:0.8rem;color:var(--gray-400);line-height:1.6;margin-bottom:16px;">
+                  {{ addr.address_line1 }}<br>
+                  {% if addr.address_line2 %}{{ addr.address_line2 }}<br>{% endif %}
+                  {{ addr.city }}, {{ addr.state }} – {{ addr.pincode }}<br>
+                  Phone: {{ addr.phone }}
+                </p>
+                <div style="display:flex;gap:12px;align-items:center;">
+                  {% if not addr.is_default %}
+                    <a href="{% url 'set_default_address' addr.pk %}" style="font-size:0.7rem;text-decoration:underline;color:var(--gold);">Set Default</a>
+                  {% endif %}
+                  <a href="{% url 'delete_address' addr.pk %}" style="font-size:0.7rem;text-decoration:underline;color:var(--danger);margin-left:auto;">Delete</a>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state" style="padding:48px 0;">
+              <div class="empty-state-icon" style="font-size:2.5rem;color:var(--gold);opacity:0.6;"><i class="fa fa-map-marker-alt"></i></div>
+              <h3 style="font-family:var(--font-heading);font-size:1.3rem;margin-top:16px;">No addresses saved</h3>
+              <p style="font-size:0.82rem;color:var(--gray-400);margin-bottom:24px;">Please add your shipping details for faster checkouts.</p>
+            </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Tab: Change Password -->
+        {% if tab == 'security' %}
+        <div class="profile-card">
+          <h2 class="profile-card-title">Change Password</h2>
+          <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="change_password">
+            <div class="form-group">
+              <label class="form-label">Current Password</label>
+              <input type="password" name="old_password" class="form-control" required placeholder="••••••••">
+            </div>
+            <div class="form-group" style="margin-top:16px;">
+              <label class="form-label">New Password</label>
+              <input type="password" name="new_password1" class="form-control" required placeholder="•••••••• (Min. 8 characters)">
+            </div>
+            <div class="form-group" style="margin-top:16px;">
+              <label class="form-label">Confirm New Password</label>
+              <input type="password" name="new_password2" class="form-control" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn btn-gold" style="margin-top:32px;">Update Password</button>
+          </form>
+        </div>
+        {% endif %}
+
+      </main>
+
+    </div>
+  </div>
+</div>
+
+<!-- Add Address Modal -->
+<div id="addressModal" role="dialog" aria-modal="true" aria-label="Add Address" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:1100;display:none;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--black-card);border:1px solid var(--black-border);padding:32px;width:100%;max-width:540px;position:relative;">
+    <button style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.8rem;color:var(--gray-500);cursor:pointer;" onclick="document.getElementById('addressModal').style.display='none'">&times;</button>
+    <h3 style="font-family:var(--font-heading);font-size:1.5rem;margin-bottom:24px;color:var(--white);">Add Shipping Address</h3>
+    <form method="post" action="{% url 'add_address' %}">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Label</label>
+          <select name="label" class="form-control">
+            <option value="home">Home</option>
+            <option value="work">Work</option>
+            <option value="other">Other</option>
+          </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Email</label>
-          <input type="email" name="email" class="form-control" value="{{ user.email }}">
+          <label class="form-label">Full Name *</label>
+          <input type="text" name="full_name" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-grid" style="margin-top:12px;">
+        <div class="form-group">
+          <label class="form-label">Phone Number *</label>
+          <input type="text" name="phone" class="form-control" required>
         </div>
         <div class="form-group">
-          <label class="form-label">Username</label>
-          <input type="text" class="form-control" value="{{ user.username }}" disabled style="opacity:0.5;">
+          <label class="form-label">Address Line 1 *</label>
+          <input type="text" name="address_line1" class="form-control" required>
         </div>
-        <button type="submit" class="btn btn-gold">Save Changes</button>
-      </form>
-    </div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;">
-      <a href="{% url 'order_history' %}" class="btn btn-outline">My Orders</a>
-      <a href="{% url 'wishlist' %}" class="btn btn-outline">My Wishlist</a>
-      <a href="{% url 'logout' %}" class="btn btn-dark">Logout</a>
-    </div>
+      </div>
+      <div class="form-grid" style="margin-top:12px;">
+        <div class="form-group">
+          <label class="form-label">Address Line 2 (Optional)</label>
+          <input type="text" name="address_line2" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label">City *</label>
+          <input type="text" name="city" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-grid" style="margin-top:12px;">
+        <div class="form-group">
+          <label class="form-label">State *</label>
+          <input type="text" name="state" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pincode *</label>
+          <input type="text" name="pincode" class="form-control" required>
+        </div>
+      </div>
+      <div style="margin-top:16px;display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" name="is_default" id="address_default">
+        <label for="address_default" style="font-size:0.8rem;color:var(--gray-400);">Set as default shipping address</label>
+      </div>
+      <button type="submit" class="btn btn-gold btn-full" style="margin-top:24px;padding:14px;">Save Address</button>
+    </form>
   </div>
 </div>
 {% endblock %}

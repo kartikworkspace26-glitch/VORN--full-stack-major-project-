@@ -102,3 +102,80 @@ class Coupon(models.Model):
             self.used_count < self.max_uses and
             order_total >= self.min_order_amount
         )
+
+
+# ── Order Status History ───────────────────────────────────────────────────────
+
+class OrderStatusHistory(models.Model):
+    """Track every status change on an order with timestamp + notes."""
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='status_history')
+    status = models.CharField(max_length=20, choices=Order.STATUS_CHOICES)
+    note = models.TextField(blank=True, help_text='Internal note or customer-visible update')
+    changed_by = models.ForeignKey(
+        'auth.User', on_delete=models.SET_NULL, null=True, blank=True,
+        help_text='Staff member who made this change'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Order Status History'
+        verbose_name_plural = 'Order Status History'
+
+    def __str__(self):
+        return f"Order #{self.order.order_number} → {self.status}"
+
+
+# ── Payment Record ─────────────────────────────────────────────────────────────
+
+class PaymentRecord(models.Model):
+    """Generalized payment record supporting multiple gateways."""
+    GATEWAY_CHOICES = [
+        ('razorpay', 'Razorpay'),
+        ('razorpay_me', 'Razorpay.me Link'),
+        ('stripe', 'Stripe'),
+        ('paypal', 'PayPal'),
+        ('upi', 'UPI Manual'),
+        ('cod', 'Cash on Delivery'),
+    ]
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('captured', 'Captured'),
+        ('failed', 'Failed'),
+        ('refunded', 'Refunded'),
+    ]
+
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payment_records')
+    gateway = models.CharField(max_length=20, choices=GATEWAY_CHOICES)
+    gateway_order_id = models.CharField(max_length=300, blank=True)
+    gateway_payment_id = models.CharField(max_length=300, blank=True)
+    gateway_signature = models.CharField(max_length=500, blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=5, default='INR')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    raw_response = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.gateway} — ₹{self.amount} — {self.status}"
+
+
+# ── Shipping Tracking ──────────────────────────────────────────────────────────
+
+class ShippingTracking(models.Model):
+    """Shipping carrier + tracking info for an order."""
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='tracking')
+    carrier = models.CharField(max_length=100, blank=True, help_text='e.g. Delhivery, BlueDart, DTDC')
+    tracking_number = models.CharField(max_length=200, blank=True)
+    tracking_url = models.URLField(blank=True)
+    estimated_delivery = models.DateField(null=True, blank=True)
+    shipped_at = models.DateTimeField(null=True, blank=True)
+    delivered_at = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Tracking #{self.tracking_number} — Order #{self.order.order_number}"
+

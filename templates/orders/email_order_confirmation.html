@@ -1,0 +1,239 @@
+<!-- VORN Order Confirmation Email Template -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VORN — Order Confirmed</title>
+</head>
+<body style="margin:0;padding:0;background:#F5F1EB;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1C1B19;">
+
+  <!-- Wrapper -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F1EB;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#FFFFFF;border:1px solid #E5DFD5;">
+
+          <!-- HEADER -->
+          <tr>
+            <td style="background:#1C1B19;padding:40px;text-align:center;">
+              <p style="margin:0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#AC8A53;font-weight:400;">
+                Refined Luxury Fashion
+              </p>
+              <h1 style="margin:12px 0 0;font-family:Georgia,serif;font-size:42px;font-weight:300;letter-spacing:0.12em;color:#FAF8F5;text-transform:uppercase;">
+                VORN
+              </h1>
+            </td>
+          </tr>
+
+          <!-- GOLD DIVIDER -->
+          <tr>
+            <td style="height:3px;background:linear-gradient(90deg,#AC8A53,#C1A270,#AC8A53);"></td>
+          </tr>
+
+          <!-- CONFIRMATION BADGE -->
+          <tr>
+            <td style="padding:40px 40px 24px;text-align:center;border-bottom:1px solid #E5DFD5;">
+              <div style="display:inline-block;width:60px;height:60px;background:#F5F1EB;border:2px solid #AC8A53;border-radius:50%;text-align:center;line-height:60px;font-size:24px;margin-bottom:20px;">
+                ✓
+              </div>
+              <h2 style="margin:16px 0 8px;font-family:Georgia,serif;font-size:26px;font-weight:300;letter-spacing:0.06em;color:#1C1B19;">
+                Order Confirmed
+              </h2>
+              <p style="margin:0;font-size:13px;color:#6E6A63;line-height:1.7;">
+                Dear <strong style="color:#1C1B19;">{{ order.full_name }}</strong>, thank you for choosing VORN.<br>
+                Your order has been received and is being prepared with care.
+              </p>
+            </td>
+          </tr>
+
+          <!-- ORDER SUMMARY BOX -->
+          <tr>
+            <td style="padding:32px 40px;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background:#F5F1EB;border:1px solid #E5DFD5;padding:24px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="50%" style="padding-bottom:16px;">
+                          <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#8A857D;">Order Number</p>
+                          <p style="margin:0;font-family:Georgia,serif;font-size:18px;color:#AC8A53;font-weight:400;">#{{ order.order_number }}</p>
+                        </td>
+                        <td width="50%" style="padding-bottom:16px;text-align:right;">
+                          <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#8A857D;">Order Date</p>
+                          <p style="margin:0;font-size:13px;color:#1C1B19;">{{ order.created_at|date:"d M Y" }}</p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td width="50%">
+                          <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#8A857D;">Payment Status</p>
+                          <p style="margin:0;font-size:13px;color:{% if order.is_paid %}#4CAF7D{% else %}#AC8A53{% endif %};font-weight:600;">
+                            {% if order.is_paid %}✓ Paid{% else %}⏳ Pending Verification{% endif %}
+                          </p>
+                        </td>
+                        <td width="50%" style="text-align:right;">
+                          <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#8A857D;">Total Amount</p>
+                          <p style="margin:0;font-family:Georgia,serif;font-size:18px;color:#1C1B19;font-weight:400;">₹{{ order.total }}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ITEMS ORDERED -->
+          <tr>
+            <td style="padding:0 40px 32px;">
+              <p style="margin:0 0 16px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#8A857D;border-bottom:1px solid #E5DFD5;padding-bottom:12px;">
+                Items Ordered
+              </p>
+              {% for item in items %}
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">
+                <tr>
+                  <td style="padding:12px 0;border-bottom:1px solid #F5F1EB;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td>
+                          <p style="margin:0 0 4px;font-size:14px;color:#1C1B19;font-weight:500;">{{ item.product_name }}</p>
+                          <p style="margin:0;font-size:11px;color:#8A857D;">
+                            {% if item.size %}Size: {{ item.size }}{% endif %}
+                            {% if item.color %} · {{ item.color }}{% endif %}
+                            · Qty: {{ item.quantity }}
+                          </p>
+                        </td>
+                        <td style="text-align:right;white-space:nowrap;">
+                          <p style="margin:0;font-family:Georgia,serif;font-size:14px;color:#1C1B19;">₹{{ item.subtotal }}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              {% endfor %}
+
+              <!-- PRICING BREAKDOWN -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px;background:#F5F1EB;border:1px solid #E5DFD5;padding:16px;">
+                <tr>
+                  <td style="padding:4px 16px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6E6A63;">Subtotal</td>
+                        <td style="padding:6px 0;font-size:13px;color:#1C1B19;text-align:right;">₹{{ order.subtotal }}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6E6A63;">Shipping</td>
+                        <td style="padding:6px 0;font-size:13px;color:#1C1B19;text-align:right;">
+                          {% if order.shipping_charge == 0 %}Free{% else %}₹{{ order.shipping_charge }}{% endif %}
+                        </td>
+                      </tr>
+                      {% if order.discount %}
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#4CAF7D;">Discount</td>
+                        <td style="padding:6px 0;font-size:13px;color:#4CAF7D;text-align:right;">−₹{{ order.discount }}</td>
+                      </tr>
+                      {% endif %}
+                      <tr>
+                        <td style="padding:12px 0 6px;font-size:15px;color:#1C1B19;font-weight:600;border-top:1px solid #E5DFD5;">Total</td>
+                        <td style="padding:12px 0 6px;font-family:Georgia,serif;font-size:18px;color:#AC8A53;text-align:right;border-top:1px solid #E5DFD5;">₹{{ order.total }}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- DELIVERY INFO -->
+          <tr>
+            <td style="padding:0 40px 32px;">
+              <p style="margin:0 0 16px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#8A857D;border-bottom:1px solid #E5DFD5;padding-bottom:12px;">
+                Delivery Information
+              </p>
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td width="50%" style="padding-right:16px;vertical-align:top;">
+                    <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#8A857D;">Ship To</p>
+                    <p style="margin:0;font-size:13px;color:#1C1B19;line-height:1.8;">
+                      {{ order.full_name }}<br>
+                      {{ order.address_line1 }}<br>
+                      {% if order.address_line2 %}{{ order.address_line2 }}<br>{% endif %}
+                      {{ order.city }}, {{ order.state }} — {{ order.pincode }}<br>
+                      📞 {{ order.phone }}
+                    </p>
+                  </td>
+                  <td width="50%" style="padding-left:16px;vertical-align:top;">
+                    <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#8A857D;">Estimated Delivery</p>
+                    <p style="margin:0;font-family:Georgia,serif;font-size:16px;color:#AC8A53;">{{ delivery_min|date:"d M" }} – {{ delivery_max|date:"d M Y" }}</p>
+                    <p style="margin:4px 0 0;font-size:12px;color:#6E6A63;">3–7 business days</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- PAYMENT ID (if available) -->
+          {% if order.razorpay_payment_id %}
+          <tr>
+            <td style="padding:0 40px 24px;">
+              <div style="background:#F5F1EB;border-left:3px solid #AC8A53;padding:16px;">
+                <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#8A857D;">Payment Reference</p>
+                <p style="margin:0;font-size:12px;color:#1C1B19;font-family:monospace;">{{ order.razorpay_payment_id }}</p>
+              </div>
+            </td>
+          </tr>
+          {% endif %}
+
+          <!-- WHAT'S NEXT -->
+          <tr>
+            <td style="padding:0 40px 32px;">
+              <div style="background:#1C1B19;padding:24px;">
+                <p style="margin:0 0 12px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#AC8A53;">What Happens Next</p>
+                <p style="margin:0 0 8px;font-size:12px;color:#FAF8F5;line-height:1.7;">📦 &nbsp;Our team will carefully inspect and pack your order within 24 hours.</p>
+                <p style="margin:0 0 8px;font-size:12px;color:#FAF8F5;line-height:1.7;">🚚 &nbsp;A tracking number will be sent to <strong>{{ order.email }}</strong> once dispatched.</p>
+                <p style="margin:0;font-size:12px;color:#FAF8F5;line-height:1.7;">💬 &nbsp;For queries, reply to this email or WhatsApp us at +91 98765 43210.</p>
+              </div>
+            </td>
+          </tr>
+
+          <!-- DIVIDER -->
+          <tr>
+            <td style="height:1px;background:#E5DFD5;margin:0 40px;"></td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td style="padding:32px 40px;text-align:center;">
+              <p style="margin:0 0 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#8A857D;">Returns &amp; Exchanges</p>
+              <p style="margin:0 0 20px;font-size:12px;color:#6E6A63;line-height:1.7;">
+                Unworn and unwashed garments may be returned within 30 days.<br>
+                Visit <a href="https://vorn.in/contact" style="color:#AC8A53;text-decoration:none;">vorn.in/contact</a> to initiate a return.
+              </p>
+              <p style="margin:0;font-family:Georgia,serif;font-size:13px;color:#1C1B19;letter-spacing:0.05em;font-style:italic;">
+                "Luxury is not about price. It's about deliberate intention."
+              </p>
+              <p style="margin:12px 0 0;font-size:10px;color:#8A857D;letter-spacing:0.1em;text-transform:uppercase;">
+                — Team VORN
+              </p>
+            </td>
+          </tr>
+
+          <!-- BOTTOM BAR -->
+          <tr>
+            <td style="background:#1C1B19;padding:16px 40px;text-align:center;">
+              <p style="margin:0;font-size:10px;color:#4A4742;letter-spacing:0.1em;">
+                © 2026 VORN. All rights reserved. &nbsp;·&nbsp;
+                <a href="https://vorn.in/privacy" style="color:#AC8A53;text-decoration:none;">Privacy</a> &nbsp;·&nbsp;
+                <a href="https://vorn.in/terms" style="color:#AC8A53;text-decoration:none;">Terms</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

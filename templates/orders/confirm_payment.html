@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Confirm Payment for Order #{{ order.order_number }} — VORN{% endblock %}
+
+{% block content %}
+<div class="page-offset">
+  <div class="section" style="padding-top:60px;">
+    <div style="max-width:600px;margin:0 auto;text-align:center;">
+
+      <!-- Icon -->
+      <div style="width:80px;height:80px;border-radius:50%;background:rgba(201,169,110,0.1);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--gold);margin:0 auto 28px;animation:scaleIn 0.5s ease both;">
+        <i class="fa fa-receipt"></i>
+      </div>
+
+      <span class="label-caps" style="display:block;margin-bottom:12px;">Order Verification</span>
+      <h1 style="font-family:var(--font-heading);font-size:2.5rem;margin-bottom:12px;">Confirm Your Payment</h1>
+      <p style="color:var(--gray-400);margin-bottom:8px;">Order <strong style="color:var(--gold);">#{{ order.order_number }}</strong></p>
+      <p style="font-family:var(--font-heading);font-size:2.8rem;color:var(--gold);margin:16px 0 32px;">₹{{ order.total }}</p>
+
+      <div style="background:var(--black-card);border:1px solid var(--black-border);padding:32px;text-align:left;">
+        <p style="font-size:0.9rem;color:var(--gray-400);margin-bottom:24px;">
+          If you have completed the payment via Razorpay, please enter the transaction or reference ID below to link it to your order. We will verify and process your order immediately.
+        </p>
+
+        <form method="post" action="{% url 'confirm_payment' order.order_number %}">
+          {% csrf_token %}
+          <div class="form-group" style="margin-bottom:24px;">
+            <label class="form-label" style="font-weight:700;">Transaction ID / Ref No. <span style="color:var(--gray-400);font-weight:400;">(Optional but recommended)</span></label>
+            <input type="text" name="transaction_id" class="form-control" placeholder="e.g. pay_XXXXXXXXXXXX or UPI reference number" required>
+            <div class="form-help" style="font-size:0.75rem;color:var(--gray-500);margin-top:8px;">
+              Find this in your payment app's transaction details or in the confirmation text/email from Razorpay.
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-gold btn-full" style="padding:18px;">
+            <i class="fa fa-check"></i> I Have Paid — Confirm Order
+          </button>
+        </form>
+      </div>
+
+      <div style="margin-top:24px;">
+        <a href="{% url 'home' %}" style="font-size:0.8rem;color:var(--gold);text-decoration:underline;text-underline-offset:3px;">
+          Return to Home
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,7 +1,23 @@
 from django.db import models
 from django.utils.text import slugify
+from django.utils import timezone
 from PIL import Image, ImageDraw, ImageFont
 import os
+
+
+class ProductTag(models.Model):
+    """Editorial tags: 'BESTSELLER', 'STAFF PICK', 'EXCLUSIVE', etc."""
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(unique=True, blank=True)
+    color = models.CharField(max_length=20, default='gold', help_text='CSS color name or hex')
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
 
 class Category(models.Model):
@@ -49,6 +65,10 @@ class Product(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='U')
     material = models.CharField(max_length=200, blank=True)
     care_instructions = models.TextField(blank=True)
+    shipping_info = models.TextField(blank=True, help_text='Shipping & returns info shown on PDP')
+    weight_grams = models.PositiveIntegerField(null=True, blank=True, help_text='Product weight in grams')
+    dimensions = models.CharField(max_length=100, blank=True, help_text='e.g. 30cm x 20cm x 5cm')
+    tags = models.ManyToManyField('ProductTag', blank=True, related_name='products')
     is_featured = models.BooleanField(default=False)
     is_new_arrival = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -154,8 +174,11 @@ class Review(models.Model):
     rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
     title = models.CharField(max_length=200)
     body = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='reviews/', null=True, blank=True, help_text='Optional photo review')
+    helpful_count = models.PositiveIntegerField(default=0)
     is_verified = models.BooleanField(default=False)
+    is_published = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ['product', 'user']
@@ -163,3 +186,77 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.product.name} - {self.rating}★"
+
+
+# ── CMS / Homepage Content Models ─────────────────────────────────────────────
+
+class HeroBanner(models.Model):
+    """Admin-managed homepage hero (video or image)."""
+    MEDIA_CHOICES = [('video', 'Video'), ('image', 'Image')]
+
+    title = models.CharField(max_length=200)
+    subtitle = models.TextField(blank=True)
+    eyebrow = models.CharField(max_length=100, blank=True, help_text='Small caps label above title')
+    media_type = models.CharField(max_length=10, choices=MEDIA_CHOICES, default='image')
+    video = models.FileField(upload_to='banners/', null=True, blank=True)
+    image = models.ImageField(upload_to='banners/', null=True, blank=True)
+    cta_text = models.CharField(max_length=80, blank=True, default='Explore Collection')
+    cta_url = models.CharField(max_length=200, blank=True, default='/shop/')
+    cta2_text = models.CharField(max_length=80, blank=True)
+    cta2_url = models.CharField(max_length=200, blank=True)
+    is_active = models.BooleanField(default=True)
+    sort_order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['sort_order', '-created_at']
+        verbose_name = 'Hero Banner'
+        verbose_name_plural = 'Hero Banners'
+
+    def __str__(self):
+        return self.title
+
+
+class EditorialSection(models.Model):
+    """Flexible homepage content block manageable from admin."""
+    POSITION_CHOICES = [
+        ('manifesto', 'Brand Manifesto'),
+        ('lookbook', 'Lookbook Strip'),
+        ('edit', 'The VORN Edit'),
+        ('usp', 'USP Strip'),
+    ]
+
+    title = models.CharField(max_length=200)
+    subtitle = models.TextField(blank=True)
+    image = models.ImageField(upload_to='editorial/', null=True, blank=True)
+    position = models.CharField(max_length=30, choices=POSITION_CHOICES)
+    is_active = models.BooleanField(default=True)
+    sort_order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['sort_order']
+
+    def __str__(self):
+        return f"{self.get_position_display()} — {self.title}"
+
+
+class LookbookPage(models.Model):
+    """Editorial lookbook campaign."""
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True)
+    season = models.CharField(max_length=50, blank=True, help_text='e.g. SS26, AW26')
+    cover_image = models.ImageField(upload_to='lookbooks/')
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title

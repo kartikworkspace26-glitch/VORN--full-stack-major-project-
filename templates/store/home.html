@@ -1,189 +1,556 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}VORN — Refined Luxury Fashion{% endblock %}
+
+{% block title %}VORN — Refined Luxury Fashion | New SS26 Collection{% endblock %}
+{% block meta_description %}Discover VORN's SS26 collection — refined luxury menswear, womenswear and accessories crafted for the discerning. Shop tailored suits, silk shirts and editorial outerwear.{% endblock %}
 
 {% block content %}
 
-<!-- ═══ HERO ═══════════════════════════════════════════════════════════ -->
-<section class="hero" id="hero">
-  <div class="hero-media">
-    {% if hero_image %}
-    <img src="{{ hero_image }}" alt="VORN Collection" loading="eager">
-    {% else %}
-    <img src="{% static 'images/hero-bg.jpg' %}" alt="VORN Luxury Collection" loading="eager">
-    {% endif %}
-  </div>
-  <div class="hero-overlay"></div>
-  <div class="hero-content">
-    <div class="hero-eyebrow">New Collection 2026</div>
-    <h1 class="hero-title">Wear the<br><em>Unseen</em></h1>
-    <p class="hero-subtitle">Precision-cut silhouettes. Exceptional fabrics.<br>Built for those who move through the world differently.</p>
-    <div class="hero-ctas">
-      <a href="{% url 'catalog' %}" class="btn btn-gold btn-lg">Explore Collection</a>
-      <a href="{% url 'catalog' %}?is_new=1" class="btn btn-outline btn-lg">New Arrivals</a>
-    </div>
-  </div>
-  <div class="hero-scroll" onclick="document.getElementById('marquee-section').scrollIntoView({behavior:'smooth'})">
-    <div class="hero-scroll-line"></div>
-    <span>Scroll</span>
-  </div>
-</section>
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 1: CINEMATIC VIDEO HERO
+     ═══════════════════════════════════════════════════════════════════ -->
+<section class="hero hero-video-section" style="position:relative;min-height:100vh;overflow:hidden;display:flex;align-items:flex-end;" aria-label="Hero banner">
 
-<!-- ═══ MARQUEE ════════════════════════════════════════════════════════ -->
-<div class="marquee-bar" id="marquee-section">
-  <div class="marquee-track">
-    {% for _ in "12345678" %}
-    <div class="marquee-chunk">
-      <span class="marquee-item">Free Shipping Over ₹999</span>
-      <span class="marquee-dot">◆</span>
-      <span class="marquee-item">New Arrivals Weekly</span>
-      <span class="marquee-dot">◆</span>
-      <span class="marquee-item">Easy Returns · 15 Days</span>
-      <span class="marquee-dot">◆</span>
-      <span class="marquee-item">Razorpay &amp; UPI Accepted</span>
-      <span class="marquee-dot">◆</span>
-      <span class="marquee-item">Use Code VORN10</span>
-      <span class="marquee-dot">◆</span>
-    </div>
-    {% endfor %}
+  <!-- Video Background -->
+  <div class="hero-video">
+    <video autoplay muted loop playsinline preload="metadata"
+           poster="{% static 'images/hero_fallback.jpg' %}"
+           aria-hidden="true">
+      <source src="{% static 'video/hero.mp4' %}" type="video/mp4">
+    </video>
   </div>
-</div>
 
-<!-- ═══ CATEGORIES ═════════════════════════════════════════════════════ -->
-{% if categories %}
-<section class="section" style="padding-bottom: 64px;">
-  <div class="section-header">
-    <span class="label-caps">Browse By</span>
-    <h2 class="heading-lg" style="margin-top:12px;">Collections</h2>
-    <div class="section-divider"></div>
-  </div>
-  <div class="cat-grid">
-    {% for cat in categories %}
-    <a href="{% url 'catalog' %}?category={{ cat.slug }}" class="cat-card">
-      {% if cat.image %}
-      <img src="{{ cat.image.url }}" alt="{{ cat.name }}" loading="lazy">
-      {% else %}
-      <img src="{% static 'images/hero-bg.jpg' %}" alt="{{ cat.name }}" loading="lazy">
-      {% endif %}
-      <div class="cat-card-body">
-        <div class="cat-card-name">{{ cat.name }}</div>
-        <div class="cat-card-cta">Shop Now →</div>
+  <!-- Gradient Overlay -->
+  <div style="position:absolute;inset:0;background:var(--grad-hero);z-index:1;"></div>
+
+  <!-- Radial Gold Glow at bottom -->
+  <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse, rgba(201,169,110,0.08) 0%, transparent 70%);z-index:1;pointer-events:none;"></div>
+
+  <!-- Content -->
+  <div class="hero-content home-hero-content">
+    <div style="max-width:700px;">
+      <div class="hero-eyebrow hero-eyebrow-animated">SS26 Collection</div>
+
+      <h1 class="hero-title hero-title-reveal">
+        <span class="word">Refined</span>&nbsp;
+        <span class="word">By</span>&nbsp;
+        <span class="word">Design.</span>
+      </h1>
+
+      <p class="hero-subtitle hero-subtitle-animated">
+        Each piece carries the weight of intention. Crafted for those who understand that true luxury is never loud.
+      </p>
+
+      <div class="hero-ctas hero-ctas-animated">
+        <a href="/shop/?gender=M" class="btn btn-gold" id="hero-cta-men">Explore Men's</a>
+        <a href="/shop/?gender=W" class="btn btn-outline" id="hero-cta-women">Explore Women's</a>
       </div>
-    </a>
-    {% endfor %}
+    </div>
+
+    <!-- Scroll Indicator -->
+    <button class="hero-scroll" id="hero-scroll-btn" aria-label="Scroll to discover">
+      <div class="hero-scroll-text">Scroll</div>
+      <div class="hero-scroll-line"></div>
+    </button>
+  </div>
+
+  <style>
+    @media (max-width: 1024px) {
+      .hero-featured-card {
+        display: none !important;
+      }
+    }
+  </style>
+
+  <!-- Featured Runway Look Floating Card -->
+  <div class="hero-featured-card" 
+       style="position:absolute;bottom:80px;right:80px;z-index:10;background:rgba(250,248,245,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--black-border);padding:16px;display:flex;gap:16px;align-items:center;max-width:320px;transition:all 0.4s var(--ease);cursor:pointer;animation:fadeUp 1.2s var(--ease) 0.4s both;" 
+       onmouseenter="this.style.borderColor='var(--gold)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 32px rgba(201,169,110,0.08)';" 
+       onmouseleave="this.style.borderColor='var(--black-border)';this.style.transform='translateY(0)';this.style.boxShadow='none';" 
+       onclick="window.location.href='/lookbook/';">
+    <div style="width:60px;height:80px;overflow:hidden;background:var(--black-elevated);flex-shrink:0;">
+      <img src="{% static 'images/lookbook_hero.jpg' %}" alt="Runway Look" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+    <div style="text-align:left;">
+      <span style="font-size:0.55rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;display:block;margin-bottom:4px;font-family:var(--font-body);font-weight:600;">Featured Runway Look</span>
+      <h4 style="font-family:var(--font-heading);font-size:1.15rem;font-weight:300;color:var(--white);margin:0 0 6px;line-height:1.2;">Look 04 — The Core</h4>
+      <span style="font-size:0.65rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.1em;border-bottom:1px solid var(--black-border-light);padding-bottom:2px;font-family:var(--font-body);font-weight:500;">Discover Lookbook</span>
+    </div>
   </div>
 </section>
-{% endif %}
 
-<!-- ═══ FEATURED PRODUCTS ══════════════════════════════════════════════ -->
-{% if featured %}
-<section class="section" style="background: var(--black-soft); border-top: 1px solid var(--black-border); border-bottom: 1px solid var(--black-border); max-width: 100%; padding: 100px 48px;">
-<div style="max-width:1440px; margin: 0 auto;">
-  <div class="section-header">
-    <span class="label-caps">Curated For You</span>
-    <h2 class="heading-lg" style="margin-top:12px;">Featured Pieces</h2>
-    <div class="section-divider"></div>
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 2: MARQUEE
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="marquee-section" style="border-top:1px solid var(--black-border);border-bottom:1px solid var(--black-border);" aria-hidden="true">
+  <div class="marquee-track" style="padding:16px 0;">
+    {% for label in "SS26 Collection · New Arrivals · Luxury Menswear · Editorial Women's · Premium Accessories · Free Shipping ₹999+ · 30-Day Returns · Made in India · Authenticity Guaranteed · "  %}{% endfor %}
+    <span style="font-size:0.58rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--gray-500);white-space:nowrap;">
+      SS26 COLLECTION &nbsp;·&nbsp; NEW ARRIVALS &nbsp;·&nbsp; LUXURY MENSWEAR &nbsp;·&nbsp; EDITORIAL WOMEN'S &nbsp;·&nbsp; PREMIUM ACCESSORIES &nbsp;·&nbsp; FREE SHIPPING ₹999+ &nbsp;·&nbsp; 30-DAY RETURNS &nbsp;·&nbsp; MADE IN INDIA &nbsp;·&nbsp; AUTHENTICITY GUARANTEED &nbsp;·&nbsp;&nbsp;&nbsp;
+    </span>
+    <span style="font-size:0.58rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--gray-500);white-space:nowrap;" aria-hidden="true">
+      SS26 COLLECTION &nbsp;·&nbsp; NEW ARRIVALS &nbsp;·&nbsp; LUXURY MENSWEAR &nbsp;·&nbsp; EDITORIAL WOMEN'S &nbsp;·&nbsp; PREMIUM ACCESSORIES &nbsp;·&nbsp; FREE SHIPPING ₹999+ &nbsp;·&nbsp; 30-DAY RETURNS &nbsp;·&nbsp; MADE IN INDIA &nbsp;·&nbsp; AUTHENTICITY GUARANTEED &nbsp;·&nbsp;&nbsp;&nbsp;
+    </span>
   </div>
-  <div class="product-grid">
-    {% for p in featured %}
-    {% include 'store/_product_card.html' with product=p %}
-    {% endfor %}
-  </div>
-  <div class="text-center mt-48">
-    <a href="{% url 'catalog' %}" class="btn btn-outline btn-lg">View All Products</a>
-  </div>
-</div>
 </section>
-{% endif %}
 
-<!-- ═══ BRAND STATEMENT ════════════════════════════════════════════════ -->
-<section style="padding: 120px 48px; text-align: center; position: relative; overflow: hidden;">
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center, rgba(201,169,110,0.04), transparent 70%);"></div>
-  <div style="position:relative;z-index:1;max-width:800px;margin:0 auto;">
-    <span class="label-caps">The VORN Philosophy</span>
-    <h2 style="font-family:var(--font-heading);font-size:clamp(2rem,5vw,4rem);font-weight:300;margin:24px auto;line-height:1.25;">
-      "Luxury is not about price.<br>It's about <em style="color:var(--gold);">deliberate intention.</em>"
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 3: BRAND MANIFESTO
+     ═══════════════════════════════════════════════════════════════════ -->
+<section class="section" style="padding: clamp(60px, 8vw, 120px) clamp(16px, 5vw, 80px); position:relative; overflow:hidden;" aria-label="Brand manifesto">
+  <!-- Background glow -->
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(ellipse, rgba(201,169,110,0.05) 0%, transparent 60%);pointer-events:none;"></div>
+
+  <div style="max-width:900px;margin:0 auto;text-align:center;position:relative;">
+    <div class="section-eyebrow reveal">The VORN Philosophy</div>
+    <h2 class="reveal reveal-d1" style="font-family:var(--font-heading);font-size:clamp(2rem,4vw,3.8rem);font-weight:300;line-height:1.25;color:var(--white);margin:24px 0 32px;">
+      We do not make clothing.<br>
+      <em style="color:var(--gold);font-style:italic;">We craft identity.</em>
     </h2>
-    <div class="gold-line" style="margin: 28px auto;"></div>
-    <p style="color:var(--gray-400);max-width:480px;margin:0 auto 40px;line-height:1.9;font-size:0.92rem;">
-      Every VORN piece begins with a question: does this serve the person wearing it? If the answer is yes, we build it to last a lifetime.
+    <p class="reveal reveal-d2" style="font-size:1rem;color:var(--gray-400);line-height:2;max-width:620px;margin:0 auto 48px;">
+      Born from the belief that what you wear is an extension of who you are — VORN exists for those who refuse to settle. Every stitch is intentional. Every silhouette is studied. This is not fashion. This is conviction.
     </p>
-    <a href="{% url 'catalog' %}" class="btn btn-gold btn-lg">Shop The Edit</a>
+    <div class="reveal reveal-d3" style="display:flex;justify-content:center;gap:40px;flex-wrap:wrap;">
+      <div style="text-align:center;">
+        <div style="font-family:var(--font-heading);font-size:2.5rem;color:var(--gold);" data-count="1200">0</div>
+        <div style="font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gray-500);margin-top:4px;">Pieces Crafted</div>
+      </div>
+      <div style="width:1px;background:var(--black-border);"></div>
+      <div style="text-align:center;">
+        <div style="font-family:var(--font-heading);font-size:2.5rem;color:var(--gold);" data-count="340">0</div>
+        <div style="font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gray-500);margin-top:4px;">Happy Clients</div>
+      </div>
+      <div style="width:1px;background:var(--black-border);"></div>
+      <div style="text-align:center;">
+        <div style="font-family:var(--font-heading);font-size:2.5rem;color:var(--gold);" data-count="6">0</div>
+        <div style="font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gray-500);margin-top:4px;">Collections</div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- ═══ NEW ARRIVALS ═══════════════════════════════════════════════════ -->
-{% if new_arrivals %}
-<section class="section">
-  <div class="section-header">
-    <span class="label-caps">Just Dropped</span>
-    <h2 class="heading-lg" style="margin-top:12px;">New Arrivals</h2>
-    <div class="section-divider"></div>
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 4: EDITORIAL COLLECTION GRID (Asymmetric)
+     ═══════════════════════════════════════════════════════════════════ -->
+<section class="section" style="padding: 0 clamp(16px, 5vw, 80px) clamp(60px, 8vw, 100px);" aria-label="Collections">
+  <div style="max-width:1400px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;">
+      <div>
+        <div class="section-eyebrow reveal">Our Collections</div>
+        <h2 class="section-title reveal reveal-d1">The Edit</h2>
+      </div>
+      <a href="/shop/" class="btn btn-outline reveal reveal-d2">View All</a>
+    </div>
+
+    <div class="editorial-grid reveal-scale">
+      <!-- Hero card: Men's -->
+      <div class="editorial-grid-hero editorial-grid-item">
+        <img src="{% static 'images/cat-outerwear.png' %}" alt="Men's Collection" loading="lazy">
+        <div class="editorial-grid-caption">
+          <div class="editorial-grid-eyebrow">Men's</div>
+          <div class="editorial-grid-title">Tailored Mastery</div>
+          <a href="/shop/?gender=M" class="editorial-grid-cta">Explore</a>
+        </div>
+      </div>
+
+      <!-- Side top: Women's -->
+      <div class="editorial-grid-side editorial-grid-item">
+        <img src="{% static 'images/lookbook_hero.jpg' %}" alt="Women's Collection" loading="lazy">
+        <div class="editorial-grid-caption">
+          <div class="editorial-grid-eyebrow">Women's</div>
+          <div class="editorial-grid-title">Effortless Elegance</div>
+          <a href="/shop/?gender=W" class="editorial-grid-cta">Explore</a>
+        </div>
+      </div>
+
+      <!-- Side bottom: Accessories -->
+      <div class="editorial-grid-side editorial-grid-item">
+        <img src="{% static 'images/cat-accessories.png' %}" alt="Accessories" loading="lazy">
+        <div class="editorial-grid-caption">
+          <div class="editorial-grid-eyebrow">Accessories</div>
+          <div class="editorial-grid-title">The Fine Details</div>
+          <a href="/shop/?category=accessories" class="editorial-grid-cta">Explore</a>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="product-grid">
-    {% for p in new_arrivals %}
-    {% include 'store/_product_card.html' with product=p %}
-    {% endfor %}
-  </div>
-  <div class="text-center mt-48">
-    <a href="{% url 'catalog' %}?is_new=1" class="btn btn-outline">See All New Arrivals</a>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 5: FEATURED PRODUCTS
+     ═══════════════════════════════════════════════════════════════════ -->
+{% if featured_products %}
+<section class="section section-dark" style="padding: clamp(48px, 6vw, 80px) clamp(16px, 5vw, 80px);" aria-label="Featured products">
+  <div style="max-width:1400px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:48px;">
+      <div class="section-eyebrow reveal">Curated for You</div>
+      <h2 class="section-title reveal reveal-d1">Staff Favourites</h2>
+    </div>
+
+    <div class="product-grid stagger-grid" id="featured-grid">
+      {% for product in featured_products %}
+      <div class="product-card">
+        <div class="product-card-image-wrap">
+          <a href="{% url 'product_detail' product.slug %}" class="product-card-link" aria-label="{{ product.name }}">
+            {% if product.primary_image %}
+            <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}"
+                 class="product-card-img" loading="lazy">
+            {% else %}
+            <div class="product-card-img" style="background:var(--black-elevated);display:flex;align-items:center;justify-content:center;">
+              <span style="color:var(--gray-600);font-size:0.7rem;letter-spacing:0.2em;">VORN</span>
+            </div>
+            {% endif %}
+          </a>
+          <!-- Badges -->
+          <div class="product-card-badges">
+            {% if product.is_new_arrival %}<span class="product-badge badge-new">New</span>{% endif %}
+            {% if product.discount_percentage %}<span class="product-badge badge-sale">−{{ product.discount_percentage }}%</span>{% endif %}
+            {% for tag in product.tags.all %}<span class="product-badge" style="background:transparent;border:1px solid var(--gold);color:var(--gold);">{{ tag.name }}</span>{% endfor %}
+          </div>
+          <!-- Wishlist & Quick Add -->
+          <div class="product-card-actions">
+            <button class="product-action-btn" data-wishlist-toggle="{{ product.id }}" aria-label="Add to wishlist">
+              <i class="far fa-heart"></i>
+            </button>
+            <button class="product-action-btn"
+                    data-quick-add
+                    data-name="{{ product.name }}"
+                    data-price="₹{{ product.price }}"
+                    data-action="/cart/add/{{ product.id }}/"
+                    aria-label="Quick add to bag">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="product-card-info">
+          <a href="{% url 'product_detail' product.slug %}" class="product-card-name">{{ product.name }}</a>
+          <div class="product-card-category">{{ product.category.name }}</div>
+          <div class="product-card-price">
+            <span class="price-current">₹{{ product.price }}</span>
+            {% if product.compare_price %}<span class="price-compare">₹{{ product.compare_price }}</span>{% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div style="text-align:center;margin-top:48px;">
+      <a href="/shop/" class="btn btn-outline" id="view-all-featured">View Full Collection →</a>
+    </div>
   </div>
 </section>
 {% endif %}
 
-<!-- ═══ FEATURE STRIP ══════════════════════════════════════════════════ -->
-<div style="border-top: 1px solid var(--black-border); border-bottom: 1px solid var(--black-border);">
-  <div class="feature-strip" style="max-width:1440px;margin:0 auto;">
-    <div class="feature-item">
-      <div class="feature-icon"><i class="fa fa-truck"></i></div>
-      <div class="feature-title">Free Shipping</div>
-      <div class="feature-text">On all orders above ₹999. Pan India delivery in 3–5 days.</div>
-    </div>
-    <div class="feature-item">
-      <div class="feature-icon"><i class="fa fa-undo-alt"></i></div>
-      <div class="feature-title">Easy Returns</div>
-      <div class="feature-text">15-day hassle-free returns. No questions asked.</div>
-    </div>
-    <div class="feature-item">
-      <div class="feature-icon"><i class="fa fa-lock"></i></div>
-      <div class="feature-title">Secure Payment</div>
-      <div class="feature-text">Razorpay + UPI + QR Code. 256-bit encrypted.</div>
-    </div>
-    <div class="feature-item">
-      <div class="feature-icon"><i class="fa fa-gem"></i></div>
-      <div class="feature-title">Premium Quality</div>
-      <div class="feature-text">Finest mills, Italian fabrics, lifetime craftsmanship.</div>
-    </div>
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 6: LOOKBOOK EDITORIAL STRIP
+     ═══════════════════════════════════════════════════════════════════ -->
+<section class="lookbook-strip-grid" aria-label="Lookbook">
+  <!-- Image side -->
+  <div style="position:relative;overflow:hidden;min-height:40vh;">
+    <img src="{% static 'images/lookbook_hero.jpg' %}" alt="SS26 Lookbook"
+         style="width:100%;height:100%;object-fit:cover;transform:scale(1.02);transition:transform 0.8s var(--ease);"
+         loading="lazy" data-parallax="0.1">
+    <div style="position:absolute;inset:0;background:linear-gradient(to right, transparent, var(--black-card));"></div>
   </div>
-</div>
-
-<!-- ═══ NEWSLETTER ═════════════════════════════════════════════════════ -->
-<section class="section-sm">
-  <div class="newsletter-wrap" style="max-width:1440px;margin:0 auto;">
-    <span class="label-caps">Stay in the Loop</span>
-    <h2 class="heading-lg" style="margin-top:16px;">The VORN Edit</h2>
-    <p style="color:var(--gray-400);margin-top:12px;font-size:0.9rem;">Exclusive drops, editorial features, and private sales. For those who know.</p>
-    <form class="newsletter-form" onsubmit="handleNewsletter(event)">
-      <input type="email" placeholder="your@email.com" required id="nlEmail">
-      <button type="submit" class="btn btn-gold">Subscribe</button>
-    </form>
-    <p style="font-size:0.72rem;color:var(--gray-500);margin-top:16px;">No spam. Unsubscribe anytime. We respect your privacy.</p>
+  <!-- Text side -->
+  <div style="background:var(--black-card);display:flex;align-items:center;padding: clamp(40px, 6vw, 80px);">
+    <div style="max-width:440px;">
+      <div class="section-eyebrow reveal">Campaign SS26</div>
+      <h2 class="reveal reveal-d1" style="font-family:var(--font-heading);font-size:clamp(2rem,3vw,3.2rem);font-weight:300;line-height:1.2;margin:16px 0 24px;">
+        The VORN<br><em style="color:var(--gold);">Lookbook</em>
+      </h2>
+      <p class="reveal reveal-d2" style="font-size:0.9rem;color:var(--gray-400);line-height:1.9;margin-bottom:32px;">
+        Six looks. One vision. Our SS26 campaign explores the intersection of architecture and the human form — where structure meets fluidity.
+      </p>
+      <div class="reveal reveal-d3" style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="/lookbook/" class="btn btn-gold" id="lookbook-cta">View Lookbook</a>
+        <a href="/shop/" class="btn btn-outline" id="shop-looks-cta">Shop the Looks</a>
+      </div>
+    </div>
   </div>
 </section>
 
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 7: THE VORN EDIT (Magazine Typography)
+     ═══════════════════════════════════════════════════════════════════ -->
+<section style="padding: clamp(60px, 8vw, 120px) clamp(16px, 5vw, 80px); background:var(--black-soft); position:relative; overflow:hidden;" aria-label="The VORN Edit">
+  <div style="position:absolute;top:0;right:0;font-family:var(--font-heading);font-size:clamp(8rem,15vw,18rem);font-weight:700;color:rgba(201,169,110,0.03);line-height:1;pointer-events:none;user-select:none;letter-spacing:-0.05em;">
+    VORN
+  </div>
+  <div style="max-width:1200px;margin:0 auto;position:relative;">
+    <div class="vorn-edit-grid" style="display:grid;gap:80px;align-items:center;">
+      <div>
+        <div class="section-eyebrow reveal">The VORN Edit</div>
+        <h2 class="reveal reveal-d1" style="font-family:var(--font-heading);font-size:clamp(2.5rem,4vw,4.5rem);font-weight:300;line-height:1.1;margin:20px 0 32px;color:var(--white);">
+          Where Every<br>Thread Tells<br><em style="color:var(--gold);">a Story.</em>
+        </h2>
+        <p class="reveal reveal-d2" style="font-size:0.9rem;color:var(--gray-400);line-height:2;margin-bottom:32px;">
+          Our editorial collections are curated by our in-house creative director — each piece selected for its story, its craft, and its power to transform how you feel in your own skin.
+        </p>
+        <a href="/shop/?is_featured=true" class="btn btn-gold reveal reveal-d3" id="edit-cta">Shop The Edit →</a>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="aspect-ratio:3/4;overflow:hidden;background:var(--black-elevated);">
+          <img src="{% static 'images/category_shirts.jpg' %}" alt="VORN Shirts"
+               style="width:100%;height:100%;object-fit:cover;transition:transform 0.8s var(--ease);"
+               loading="lazy"
+               onmouseenter="this.style.transform='scale(1.06)'"
+               onmouseleave="this.style.transform='scale(1)'">
+        </div>
+        <div style="display:grid;gap:12px;align-content:start;padding-top:40px;">
+          <div style="aspect-ratio:3/4;overflow:hidden;background:var(--black-elevated);">
+            <img src="{% static 'images/category_trousers.jpg' %}" alt="VORN Trousers"
+                 style="width:100%;height:100%;object-fit:cover;transition:transform 0.8s var(--ease);"
+                 loading="lazy"
+                 onmouseenter="this.style.transform='scale(1.06)'"
+                 onmouseleave="this.style.transform='scale(1)'">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 8: NEW ARRIVALS (Staggered Strip)
+     ═══════════════════════════════════════════════════════════════════ -->
+{% if new_arrivals %}
+<section class="section" style="padding: clamp(48px, 6vw, 80px) clamp(16px, 5vw, 80px);" aria-label="New arrivals">
+  <div style="max-width:1400px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;">
+      <div>
+        <div class="section-eyebrow reveal">Just In</div>
+        <h2 class="section-title reveal reveal-d1">New Arrivals</h2>
+      </div>
+      <a href="/shop/?is_new=true" class="btn btn-outline reveal reveal-d2" id="new-arrivals-all">See All</a>
+    </div>
+
+    <div class="product-carousel-wrap">
+      <div class="product-carousel stagger-grid" id="new-arrivals-carousel">
+        {% for product in new_arrivals %}
+        <div class="product-card">
+          <div class="product-card-image-wrap">
+            <a href="{% url 'product_detail' product.slug %}" aria-label="{{ product.name }}">
+              {% if product.primary_image %}
+              <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}"
+                   class="product-card-img" loading="lazy">
+              {% else %}
+              <div class="product-card-img" style="background:var(--black-elevated);display:flex;align-items:center;justify-content:center;">
+                <span style="color:var(--gray-600);font-size:0.7rem;letter-spacing:0.2em;">VORN</span>
+              </div>
+              {% endif %}
+            </a>
+            <span class="product-badge badge-new" style="position:absolute;top:12px;left:12px;">New</span>
+            <div class="product-card-actions">
+              <button class="product-action-btn" data-wishlist-toggle="{{ product.id }}" aria-label="Add to wishlist">
+                <i class="far fa-heart"></i>
+              </button>
+            </div>
+          </div>
+          <div class="product-card-info">
+            <a href="{% url 'product_detail' product.slug %}" class="product-card-name">{{ product.name }}</a>
+            <div class="product-card-price">
+              <span class="price-current">₹{{ product.price }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 9: CATEGORY TILES (3-column)
+     ═══════════════════════════════════════════════════════════════════ -->
+<section class="section" style="padding: clamp(48px, 6vw, 80px) clamp(16px, 5vw, 80px);" aria-label="Shop by category">
+  <div style="max-width:1400px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:48px;">
+      <div class="section-eyebrow reveal">Shop By Category</div>
+      <h2 class="section-title reveal reveal-d1">Find Your Style</h2>
+    </div>
+    <div class="category-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:24px;">
+      <!-- Card 1: Men's -->
+      <a href="/shop/?gender=M" class="editorial-grid-item reveal reveal-d1" style="aspect-ratio:2/3;display:block;background:var(--black-elevated);">
+        <img src="{% static 'images/brand_banner.png' %}" alt="Men's Collection" loading="lazy">
+        <div class="editorial-grid-caption">
+          <div class="editorial-grid-eyebrow">Collection</div>
+          <div class="editorial-grid-title">Men's Collection</div>
+          <div class="editorial-grid-cta">Explore Collection</div>
+        </div>
+      </a>
+      <!-- Card 2: Women's -->
+      <a href="/shop/?gender=W" class="editorial-grid-item reveal reveal-d2" style="aspect-ratio:2/3;display:block;background:var(--black-elevated);">
+        <img src="{% static 'images/lookbook_hero.jpg' %}" alt="Women's Collection" loading="lazy">
+        <div class="editorial-grid-caption">
+          <div class="editorial-grid-eyebrow">Collection</div>
+          <div class="editorial-grid-title">Women's Collection</div>
+          <div class="editorial-grid-cta">Explore Collection</div>
+        </div>
+      </a>
+      <!-- Card 3: Shirts -->
+      <a href="/shop/?category=shirts" class="editorial-grid-item reveal reveal-d3" style="aspect-ratio:2/3;display:block;background:var(--black-elevated);">
+        <img src="{% static 'images/cat-shirts.png' %}" alt="Shirts" loading="lazy">
+        <div class="editorial-grid-caption">
+          <div class="editorial-grid-eyebrow">Category</div>
+          <div class="editorial-grid-title">Shirts</div>
+          <div class="editorial-grid-cta">Shop Now</div>
+        </div>
+      </a>
+      <!-- Card 4: Trousers -->
+      <a href="/shop/?category=trousers" class="editorial-grid-item reveal reveal-d4" style="aspect-ratio:2/3;display:block;background:var(--black-elevated);">
+        <img src="{% static 'images/cat-trousers.png' %}" alt="Trousers" loading="lazy">
+        <div class="editorial-grid-caption">
+          <div class="editorial-grid-eyebrow">Category</div>
+          <div class="editorial-grid-title">Trousers</div>
+          <div class="editorial-grid-cta">Shop Now</div>
+        </div>
+      </a>
+      <!-- Card 5: Outerwear -->
+      <a href="/shop/?category=outerwear" class="editorial-grid-item reveal reveal-d5" style="aspect-ratio:2/3;display:block;background:var(--black-elevated);">
+        <img src="{% static 'images/cat-outerwear.png' %}" alt="Outerwear" loading="lazy">
+        <div class="editorial-grid-caption">
+          <div class="editorial-grid-eyebrow">Category</div>
+          <div class="editorial-grid-title">Outerwear</div>
+          <div class="editorial-grid-cta">Shop Now</div>
+        </div>
+      </a>
+      <!-- Card 6: Knitwear -->
+      <a href="/shop/?category=knitwear" class="editorial-grid-item reveal reveal-d6" style="aspect-ratio:2/3;display:block;background:var(--black-elevated);">
+        <img src="{% static 'images/cat-knitwear.png' %}" alt="Knitwear" loading="lazy">
+        <div class="editorial-grid-caption">
+          <div class="editorial-grid-eyebrow">Category</div>
+          <div class="editorial-grid-title">Knitwear</div>
+          <div class="editorial-grid-cta">Shop Now</div>
+        </div>
+      </a>
+      <!-- Card 7: Accessories -->
+      <a href="/shop/?category=accessories" class="editorial-grid-item reveal reveal-d7" style="aspect-ratio:2/3;display:block;background:var(--black-elevated);">
+        <img src="{% static 'images/cat-accessories.png' %}" alt="Accessories" loading="lazy">
+        <div class="editorial-grid-caption">
+          <div class="editorial-grid-eyebrow">Category</div>
+          <div class="editorial-grid-title">Accessories</div>
+          <div class="editorial-grid-cta">Shop Now</div>
+        </div>
+      </a>
+      <!-- Card 8: Footwear -->
+      <a href="/shop/?category=footwear" class="editorial-grid-item reveal reveal-d8" style="aspect-ratio:2/3;display:block;background:var(--black-elevated);">
+        <img src="{% static 'images/cat-footwear.png' %}" alt="Footwear" loading="lazy">
+        <div class="editorial-grid-caption">
+          <div class="editorial-grid-eyebrow">Category</div>
+          <div class="editorial-grid-title">Footwear</div>
+          <div class="editorial-grid-cta">Shop Now</div>
+        </div>
+      </a>
+      <!-- Card 9: Perfumes -->
+      <a href="/shop/?category=perfumes" class="editorial-grid-item reveal reveal-d9" style="aspect-ratio:2/3;display:block;background:var(--black-elevated);">
+        <img src="{% static 'images/cat-perfumes.png' %}" alt="Perfumes" loading="lazy">
+        <div class="editorial-grid-caption">
+          <div class="editorial-grid-eyebrow">Category</div>
+          <div class="editorial-grid-title">Perfumes</div>
+          <div class="editorial-grid-cta">Shop Now</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 10: TESTIMONIAL PULL QUOTE
+     ═══════════════════════════════════════════════════════════════════ -->
+<section style="padding: clamp(60px, 8vw, 120px) clamp(16px, 5vw, 80px); border-top:1px solid var(--black-border); border-bottom:1px solid var(--black-border); background:var(--black-card);" aria-label="Testimonials">
+  <div style="max-width:800px;margin:0 auto;text-align:center;">
+    <div style="font-size:3rem;color:var(--gold);opacity:0.3;margin-bottom:8px;font-family:Georgia;">"</div>
+    <blockquote class="reveal" style="font-family:var(--font-heading);font-size:clamp(1.3rem,2.5vw,2.2rem);font-weight:300;line-height:1.5;color:var(--cream);font-style:italic;margin:0 0 32px;">
+      VORN is the only brand that makes me feel like I'm wearing armour. Every piece is considered. The quality speaks for itself. This is what luxury should feel like.
+    </blockquote>
+    <div class="reveal reveal-d1" style="font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);">
+      Aarav Sharma — Creative Director, Delhi
+    </div>
+    <!-- Star rating -->
+    <div class="reveal reveal-d2" style="color:var(--gold);font-size:1rem;margin-top:16px;">
+      <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 11: BRAND USPs
+     ═══════════════════════════════════════════════════════════════════ -->
+<section class="section" style="padding: clamp(48px, 6vw, 80px) clamp(16px, 5vw, 80px);" aria-label="Why VORN">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:40px; text-align:center;">
+      {% for usp in usps %}
+      <div class="reveal reveal-d{{ forloop.counter }}">
+        <div style="font-size:1.8rem;color:var(--gold);margin-bottom:16px;"><i class="{{ usp.icon }}"></i></div>
+        <div style="font-family:var(--font-heading);font-size:1.1rem;color:var(--cream);margin-bottom:8px;">{{ usp.title }}</div>
+        <div style="font-size:0.82rem;color:var(--gray-400);line-height:1.7;">{{ usp.desc }}</div>
+      </div>
+      {% empty %}
+      <div class="reveal">
+        <div style="font-size:1.8rem;color:var(--gold);margin-bottom:16px;"><i class="fa fa-shield-halved"></i></div>
+        <div style="font-family:var(--font-heading);font-size:1.1rem;color:var(--cream);margin-bottom:8px;">100% Authentic</div>
+        <div style="font-size:0.82rem;color:var(--gray-400);line-height:1.7;">Every product certified genuine. No counterfeits, ever.</div>
+      </div>
+      <div class="reveal reveal-d1">
+        <div style="font-size:1.8rem;color:var(--gold);margin-bottom:16px;"><i class="fa fa-truck-fast"></i></div>
+        <div style="font-family:var(--font-heading);font-size:1.1rem;color:var(--cream);margin-bottom:8px;">Free Shipping</div>
+        <div style="font-size:0.82rem;color:var(--gray-400);line-height:1.7;">Complimentary on all orders above ₹999. Pan-India.</div>
+      </div>
+      <div class="reveal reveal-d2">
+        <div style="font-size:1.8rem;color:var(--gold);margin-bottom:16px;"><i class="fa fa-arrows-rotate"></i></div>
+        <div style="font-family:var(--font-heading);font-size:1.1rem;color:var(--cream);margin-bottom:8px;">30-Day Returns</div>
+        <div style="font-size:0.82rem;color:var(--gray-400);line-height:1.7;">Hassle-free returns. No questions asked, always.</div>
+      </div>
+      <div class="reveal reveal-d3">
+        <div style="font-size:1.8rem;color:var(--gold);margin-bottom:16px;"><i class="fa fa-lock"></i></div>
+        <div style="font-family:var(--font-heading);font-size:1.1rem;color:var(--cream);margin-bottom:8px;">Secure Checkout</div>
+        <div style="font-size:0.82rem;color:var(--gray-400);line-height:1.7;">256-bit SSL encryption. Razorpay & UPI accepted.</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 12: NEWSLETTER (Full-Width Enhanced)
+     ═══════════════════════════════════════════════════════════════════ -->
+<section class="newsletter-full" aria-label="Newsletter signup">
+  <div style="position:relative;z-index:1;max-width:560px;margin:0 auto;">
+    <div class="newsletter-eyebrow-line">
+      <span style="font-size:0.58rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);">Join the Inner Circle</span>
+    </div>
+    <h2 class="reveal" style="font-family:var(--font-heading);font-size:clamp(2rem,3vw,3.2rem);font-weight:300;color:var(--white);margin-bottom:16px;">
+      First to Know.<br><em style="color:var(--gold);">First to Own.</em>
+    </h2>
+    <p class="reveal reveal-d1" style="font-size:0.88rem;color:var(--gray-400);line-height:1.9;margin-bottom:40px;">
+      Exclusive early access to new collections, private sale invitations, styling notes from our creative team, and stories from the VORN world.
+    </p>
+    <form action="/accounts/newsletter/subscribe/" method="POST" class="reveal reveal-d2" style="display:flex;gap:0;max-width:440px;margin:0 auto;">
+      {% csrf_token %}
+      <input type="email" name="email" placeholder="Enter your email address"
+             id="newsletter-email-input"
+             style="flex:1;background:var(--black-elevated);border:1px solid var(--black-border-light);border-right:none;color:var(--white);padding:14px 20px;font-size:0.85rem;font-family:var(--font-body);outline:none;"
+             required autocomplete="email">
+      <button type="submit" class="btn btn-gold" id="newsletter-submit" style="border-radius:0;white-space:nowrap;padding:14px 28px;">
+        Subscribe
+      </button>
+    </form>
+    <p class="reveal reveal-d3" style="font-size:0.65rem;color:var(--gray-600);margin-top:16px;">
+      By subscribing you agree to our <a href="#" style="color:var(--gold);">Privacy Policy</a>. Unsubscribe anytime.
+    </p>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/vorn-product.js' %}" defer></script>
 <script>
-function handleNewsletter(e) {
-  e.preventDefault();
-  const btn = e.target.querySelector('button');
-  btn.innerHTML = '<i class="fa fa-check"></i> Subscribed!';
-  btn.style.background = 'var(--success)';
-  document.getElementById('nlEmail').value = '';
-  setTimeout(() => { btn.innerHTML = 'Subscribe'; btn.style.background = ''; }, 3000);
-}
-// Intersection observer for fade-up animations
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('fade-up'); observer.unobserve(e.target); }});
-}, { threshold: 0.1 });
-document.querySelectorAll('.product-card, .cat-card, .feature-item').forEach(el => observer.observe(el));
+// ── Hero Scroll Button ─────────────────────────────────────────────────────
+document.getElementById('hero-scroll-btn')?.addEventListener('click', () => {
+  document.getElementById('marquee-section')?.scrollIntoView({ behavior: 'smooth' });
+});
 </script>
 {% endblock %}

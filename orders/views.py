@@ -208,19 +208,15 @@ def initiate_payment_link(request):
         messages.error(request, err)
         return redirect('checkout')
 
-    # Amount in paise for Razorpay.me URL
-    amount_paise = order.total_in_paise
-
-    # Razorpay.me accepts amount in paise as query param
-    razorpay_me = settings.RAZORPAY_ME_LINK
-    payment_url = f"{razorpay_me}?amount={amount_paise}"
+    # Razorpay.me payment URL (strictly ends with @vorn)
+    payment_url = settings.RAZORPAY_ME_LINK
 
     # Redirect to payment page (intermediate page that opens Razorpay.me)
     return render(request, 'orders/payment_link.html', {
         'order': order,
         'payment_url': payment_url,
         'amount_rupees': order.total,
-        'razorpay_me': razorpay_me,
+        'razorpay_me': settings.RAZORPAY_ME_LINK,
     })
 
 
@@ -340,7 +336,82 @@ def payment_callback(request):
 # ── Order Success ──────────────────────────────────────────────────────────────
 def order_success(request, order_number):
     order = get_object_or_404(Order, order_number=order_number)
-    return render(request, 'orders/success.html', {'order': order})
+    items = order.items.all().select_related('product')
+
+    # Calculate estimated delivery date (3–7 business days)
+    from datetime import timedelta
+    from django.utils import timezone
+    today = timezone.now().date()
+    # Add business days (skip weekends)
+    def add_business_days(start, days):
+        current = start
+        added = 0
+        while added < days:
+            current += timedelta(days=1)
+            if current.weekday() < 5:  # Mon-Fri
+                added += 1
+        return current
+
+    delivery_min = add_business_days(today, 3)
+    delivery_max = add_business_days(today, 7)
+    delivery_days_min = 3
+    delivery_days_max = 7
+
+    # Send fake order confirmation email
+    email_sent = False
+    if order.email:
+        try:
+            from django.core.mail import EmailMultiAlternatives
+            from django.template.loader import render_to_string
+
+            # Plain-text fallback
+            items_text = ""
+            for item in items:
+                items_text += f"  • {item.product_name} (Size: {item.size or 'Free Size'}) x{item.quantity} — ₹{item.subtotal}\n"
+
+            plain_body = (
+                f"VORN — Order Confirmed #{order.order_number}\n\n"
+                f"Dear {order.full_name},\n\n"
+                f"Thank you for your order. Here are your details:\n\n"
+                f"Order: #{order.order_number}\n"
+                f"Total: ₹{order.total}\n"
+                f"Payment: {'Paid' if order.is_paid else 'Pending Verification'}\n\n"
+                f"Items:\n{items_text}\n"
+                f"Delivery: {delivery_min.strftime('%d %b')} – {delivery_max.strftime('%d %b %Y')}\n"
+                f"Ship to: {order.address_line1}, {order.city}, {order.state} — {order.pincode}\n\n"
+                f"Questions? Email hello@vorn.in\n\n— Team VORN"
+            )
+
+            # HTML email using template
+            html_body = render_to_string('orders/email_order_confirmation.html', {
+                'order': order,
+                'items': items,
+                'delivery_min': delivery_min,
+                'delivery_max': delivery_max,
+            })
+
+            msg = EmailMultiAlternatives(
+                subject=f'VORN — Order Confirmed #{order.order_number}',
+                body=plain_body,
+                from_email='VORN <orders@vorn.in>',
+                to=[order.email],
+            )
+            msg.attach_alternative(html_body, 'text/html')
+            msg.send(fail_silently=True)
+            email_sent = True
+        except Exception as e:
+            print(f"[VORN Email] Failed to send confirmation: {e}")
+            email_sent = False
+
+    return render(request, 'orders/success.html', {
+        'order': order,
+        'items': items,
+        'delivery_min': delivery_min,
+        'delivery_max': delivery_max,
+        'delivery_days_min': delivery_days_min,
+        'delivery_days_max': delivery_days_max,
+        'email_sent': email_sent,
+    })
 
 
 # ── Order History ──────────────────────────────────────────────────────────────

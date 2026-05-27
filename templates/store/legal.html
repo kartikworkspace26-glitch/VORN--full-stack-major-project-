@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Terms & Policies — VORN{% endblock %}
+
+{% block content %}
+<div class="page-offset">
+  <div class="page-hero">
+    <span class="label-caps">VORN Legal</span>
+    <h1 class="heading-lg" style="margin-top:12px;">Terms & Policies</h1>
+    <p style="color:var(--gray-400);font-size:0.95rem;margin-top:20px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.7;font-weight:300;">
+      Please read these policies carefully. By accessing or shopping on VORN, you agree to be bound by these conditions.
+    </p>
+  </div>
+
+  <div class="section" style="padding-top:48px;max-width:900px;margin:0 auto;">
+    
+    <!-- Table of Contents / Sidebar style anchors -->
+    <div style="display:flex;gap:12px;margin-bottom:60px;justify-content:center;flex-wrap:wrap;border-bottom:1px solid var(--black-border);padding-bottom:20px;">
+      <a href="#privacy" class="btn btn-dark btn-sm">Privacy Policy</a>
+      <a href="#terms" class="btn btn-dark btn-sm">Terms of Service</a>
+      <a href="#cookies" class="btn btn-dark btn-sm">Cookie Policy</a>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:60px;">
+      
+      <!-- Privacy Policy Section -->
+      <div id="privacy" style="scroll-margin-top: 100px;">
+        <h2 style="font-family:var(--font-heading);font-size:2rem;color:var(--gold);margin-bottom:20px;text-transform:uppercase;letter-spacing:0.05em;">Privacy Policy</h2>
+        <div style="font-size:0.9rem;color:var(--gray-400);line-height:1.85;font-weight:300;display:flex;flex-direction:column;gap:16px;">
+          <p>
+            At VORN, we value the trust you place in us. This Privacy Policy describes how we collect, use, disclose, and protect your personal information when you visit our website, register an account, or place an order.
+          </p>
+          <p>
+            <strong>Information We Collect:</strong> We collect personal details that you provide to us directly, such as your name, billing and shipping addresses, email address, telephone numbers, and profile details.
+          </p>
+          <p>
+            <strong>Payment Security:</strong> Payment transactions are handled through secure gateways (such as Razorpay). We do not collect or store your complete card credentials or bank account details on our servers.
+          </p>
+        </div>
+      </div>
+
+      <!-- Terms of Service Section -->
+      <div id="terms" style="scroll-margin-top: 100px; border-top: 1px solid var(--black-border-light); padding-top:40px;">
+        <h2 style="font-family:var(--font-heading);font-size:2rem;color:var(--gold);margin-bottom:20px;text-transform:uppercase;letter-spacing:0.05em;">Terms of Service</h2>
+        <div style="font-size:0.9rem;color:var(--gray-400);line-height:1.85;font-weight:300;display:flex;flex-direction:column;gap:16px;">
+          <p>
+            These Terms of Service govern your use of the website and services provided by VORN. By accessing our site, you agree to comply with all applicable local, national, and international laws.
+          </p>
+          <p>
+            <strong>Product Information:</strong> VORN strives to provide highly accurate descriptions and visual assets for all items, including apparel and fragrances. However, actual colors and sizes may vary slightly depending on monitor resolutions or hand-crafted variances.
+          </p>
+          <p>
+            <strong>Pricing & Availability:</strong> All prices are displayed in Indian Rupees (INR) and are inclusive of standard local taxes unless specified otherwise. We reserve the right to amend pricing, limit order quantities, or cancel orders at our sole discretion.
+          </p>
+        </div>
+      </div>
+
+      <!-- Cookie Policy Section -->
+      <div id="cookies" style="scroll-margin-top: 100px; border-top: 1px solid var(--black-border-light); padding-top:40px;">
+        <h2 style="font-family:var(--font-heading);font-size:2rem;color:var(--gold);margin-bottom:20px;text-transform:uppercase;letter-spacing:0.05em;">Cookie Policy</h2>
+        <div style="font-size:0.9rem;color:var(--gray-400);line-height:1.85;font-weight:300;display:flex;flex-direction:column;gap:16px;">
+          <p>
+            VORN uses cookies and similar tracking technologies to enhance your shopping experience, personalize content, and analyze our site traffic.
+          </p>
+          <p>
+            <strong>Essential Cookies:</strong> These cookies are critical to operating our website, enabling core features like security, session-based wishlists, and shopping cart persistence.
+          </p>
+          <p>
+            <strong>Performance Cookies:</strong> We use analytical cookies to help us understand how visitors interact with our catalog, allowing us to continuously improve the visual layout and user experience.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -37,14 +37,15 @@
           Shipping Information
         </div>
 
-        <form method="post" action="{% url 'initiate_payment_link' %}" id="checkoutForm" novalidate>
+        <!-- This form does NOT submit traditionally — JS intercepts it -->
+        <form id="checkoutForm" novalidate>
           {% csrf_token %}
 
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Full Name *</label>
               <input type="text" name="full_name" id="full_name" class="form-control" required
-                     value="{{ user.get_full_name|default:'' }}" placeholder="Puran Rai">
+                     value="{{ user.get_full_name|default:'' }}" placeholder="Your Full Name">
               <div class="form-error" id="err_full_name"></div>
             </div>
             <div class="form-group">
@@ -94,38 +95,34 @@
             <div class="form-error" id="err_pincode"></div>
           </div>
 
-          <!-- Payment Method Preview -->
+          <!-- Payment Method Display -->
           <div style="margin:32px 0;padding:20px 24px;background:var(--black-elevated);border:1px solid var(--black-border);">
             <div class="label-caps" style="margin-bottom:16px;">Payment Method</div>
-
-            <!-- Razorpay.me (Primary) -->
             <div style="display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--black-border);">
               <div style="width:40px;height:40px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;color:var(--black);font-size:1rem;flex-shrink:0;">
                 <i class="fa fa-bolt"></i>
               </div>
               <div style="flex:1;">
                 <div style="font-weight:600;margin-bottom:3px;">Razorpay — Cards, UPI, Wallets, Net Banking</div>
-                <div style="font-size:0.75rem;color:var(--gray-400);">Pay instantly via Razorpay secure gateway · <span style="color:var(--gold);">razorpay.me/@puranrai9473</span></div>
+                <div style="font-size:0.75rem;color:var(--gray-400);">Pay instantly via Razorpay secure checkout · Opens payment popup</div>
               </div>
               <i class="fa fa-check-circle" style="color:var(--gold);font-size:1.1rem;"></i>
             </div>
-
-            <!-- UPI QR badge row -->
             <div style="display:flex;gap:16px;padding-top:14px;flex-wrap:wrap;">
-              <span style="font-size:0.7rem;color:var(--gray-400);display:flex;align-items:center;gap:6px;"><img src="https://img.icons8.com/color/20/google-pay-india.png" style="height:18px;"> Google Pay</span>
-              <span style="font-size:0.7rem;color:var(--gray-400);display:flex;align-items:center;gap:6px;"><img src="https://img.icons8.com/color/20/phonepe.png" style="height:18px;"> PhonePe</span>
-              <span style="font-size:0.7rem;color:var(--gray-400);display:flex;align-items:center;gap:6px;"><i class="fa fa-credit-card" style="color:var(--gold);"></i> Cards</span>
+              <span style="font-size:0.7rem;color:var(--gray-400);display:flex;align-items:center;gap:6px;"><i class="fa fa-mobile-alt" style="color:var(--gold);"></i> UPI / GPay / PhonePe</span>
+              <span style="font-size:0.7rem;color:var(--gray-400);display:flex;align-items:center;gap:6px;"><i class="fa fa-credit-card" style="color:var(--gold);"></i> Debit / Credit Card</span>
               <span style="font-size:0.7rem;color:var(--gray-400);display:flex;align-items:center;gap:6px;"><i class="fa fa-university" style="color:var(--gold);"></i> Net Banking</span>
             </div>
           </div>
 
-          <button type="submit" class="btn btn-gold btn-full" style="padding:18px;font-size:0.8rem;" id="checkoutBtn">
-            <i class="fa fa-lock"></i>&nbsp; Proceed to Payment · ₹<span id="totalAmtBtn">{{ total }}</span>
+          <!-- PAY BUTTON -->
+          <button type="button" onclick="startPayment()" class="btn btn-gold btn-full" style="padding:18px;font-size:0.8rem;" id="checkoutBtn">
+            <i class="fa fa-lock"></i>&nbsp; Pay Securely · ₹<span id="totalAmtBtn">{{ total }}</span>
           </button>
 
           <div class="trust-badges" style="margin-top:16px;flex-wrap:wrap;justify-content:center;">
             <div class="trust-badge"><i class="fa fa-shield-alt"></i> SSL Encrypted</div>
-            <div class="trust-badge"><i class="fa fa-bolt"></i> Instant Payment</div>
+            <div class="trust-badge"><i class="fa fa-bolt"></i> Powered by Razorpay</div>
             <div class="trust-badge"><i class="fa fa-undo"></i> 15-Day Returns</div>
           </div>
         </form>
@@ -157,7 +154,7 @@
         <div style="margin:20px 0;padding:16px;border:1px dashed var(--black-border-light);">
           <div style="font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Coupon Code</div>
           <div style="display:flex;gap:8px;">
-            <input type="text" id="couponInput" placeholder="VORN10, WELCOME20, FLAT500" class="form-control" style="flex:1;font-size:0.82rem;">
+            <input type="text" id="couponInput" placeholder="e.g. VORN10" class="form-control" style="flex:1;font-size:0.82rem;">
             <button onclick="applyCoupon()" class="btn btn-dark btn-sm" style="flex-shrink:0;padding:10px 16px;">Apply</button>
           </div>
           <div id="couponMsg" style="font-size:0.75rem;margin-top:8px;"></div>
@@ -180,15 +177,14 @@
           <span class="summary-total-amount">₹<span id="totalDisplay">{{ total }}</span></span>
         </div>
 
-        <!-- Payment provider -->
+        <!-- Razorpay badge -->
         <div style="margin-top:20px;text-align:center;padding:16px;background:var(--black-elevated);border:1px solid var(--black-border);">
           <div style="font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-500);margin-bottom:10px;">Secured by</div>
           <div style="font-size:0.9rem;font-weight:700;color:var(--gold);letter-spacing:0.1em;">RAZORPAY</div>
-          <div style="font-size:0.7rem;color:var(--gray-500);margin-top:6px;">razorpay.me/@puranrai9473</div>
           <div style="display:flex;justify-content:center;gap:12px;margin-top:14px;flex-wrap:wrap;">
             <i class="fa fa-lock" style="color:var(--gold);font-size:1rem;" title="SSL Encrypted"></i>
             <i class="fa fa-shield-alt" style="color:var(--gold);font-size:1rem;" title="PCI DSS Compliant"></i>
-            <i class="fa fa-qrcode" style="color:var(--gold);font-size:1rem;" title="UPI Supported"></i>
+            <i class="fa fa-mobile-alt" style="color:var(--gold);font-size:1rem;" title="UPI Supported"></i>
           </div>
         </div>
       </div>
@@ -197,11 +193,25 @@
   </div>
 </div>
 
+<!-- Hidden form for payment callback POST -->
+<form id="paymentCallbackForm" method="post" action="{% url 'payment_callback' %}" style="display:none;">
+  {% csrf_token %}
+  <input type="hidden" name="razorpay_payment_id" id="rzp_payment_id">
+  <input type="hidden" name="razorpay_order_id" id="rzp_order_id">
+  <input type="hidden" name="razorpay_signature" id="rzp_signature">
+</form>
+
+<!-- Razorpay Checkout JS -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <script>
+const CSRF_TOKEN = '{{ csrf_token }}';
 const baseSubtotal = {{ subtotal }};
 const baseShipping = {{ shipping }};
 let discount = 0;
+let currentTotal = {{ total }};
 
+// ── Coupon Apply ──────────────────────────────────────────────
 function applyCoupon() {
   const code = document.getElementById('couponInput').value.trim().toUpperCase();
   if (!code) return;
@@ -211,18 +221,18 @@ function applyCoupon() {
 
   fetch("{% url 'apply_coupon' %}", {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': '{{ csrf_token }}' },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': CSRF_TOKEN },
     body: 'code=' + encodeURIComponent(code),
   }).then(r => r.json()).then(d => {
     btn.innerHTML = 'Apply'; btn.disabled = false;
     const msg = document.getElementById('couponMsg');
     if (d.success) {
       discount = d.discount;
-      const newTotal = Math.max(baseSubtotal + baseShipping - discount, 1);
+      currentTotal = Math.max(baseSubtotal + baseShipping - discount, 1);
       document.getElementById('discountAmt').textContent = Math.round(discount);
       document.getElementById('discountRow').style.display = 'flex';
-      document.getElementById('totalDisplay').textContent = Math.round(newTotal);
-      document.getElementById('totalAmtBtn').textContent = Math.round(newTotal);
+      document.getElementById('totalDisplay').textContent = Math.round(currentTotal);
+      document.getElementById('totalAmtBtn').textContent = Math.round(currentTotal);
       msg.style.color = 'var(--success)';
       msg.textContent = '✓ ' + d.code + ' applied — you save ₹' + Math.round(discount);
     } else {
@@ -232,8 +242,8 @@ function applyCoupon() {
   }).catch(() => { btn.innerHTML = 'Apply'; btn.disabled = false; });
 }
 
-// Client-side form validation
-document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+// ── Validate Form ─────────────────────────────────────────────
+function validateForm() {
   const required = ['full_name', 'email', 'phone', 'address_line1', 'city', 'state', 'pincode'];
   let valid = true;
   required.forEach(id => {
@@ -242,7 +252,7 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
     const err = document.getElementById('err_' + id);
     if (!el.value.trim()) {
       el.classList.add('error');
-      if (err) err.textContent = 'Required';
+      if (err) err.textContent = 'This field is required';
       if (valid) el.focus();
       valid = false;
     } else {
@@ -250,12 +260,133 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
       if (err) err.textContent = '';
     }
   });
-  if (!valid) e.preventDefault();
-  else {
-    const btn = document.getElementById('checkoutBtn');
-    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Redirecting to Payment…';
-    btn.disabled = true;
-  }
-});
+  return valid;
+}
+
+// ── Get Form Data as Object ───────────────────────────────────
+function getFormData() {
+  const form = document.getElementById('checkoutForm');
+  const data = {};
+  new FormData(form).forEach((v, k) => { data[k] = v; });
+  return data;
+}
+
+// ── Main Payment Function ─────────────────────────────────────
+function startPayment() {
+  if (!validateForm()) return;
+
+  const btn = document.getElementById('checkoutBtn');
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating order…';
+  btn.disabled = true;
+
+  // Step 1: Create order in Django + get Razorpay order ID
+  fetch("{% url 'create_razorpay_order' %}", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': CSRF_TOKEN,
+    },
+    body: JSON.stringify(getFormData()),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) {
+      alert('Error: ' + data.error);
+      btn.innerHTML = '<i class="fa fa-lock"></i>&nbsp; Pay Securely · ₹' + Math.round(currentTotal);
+      btn.disabled = false;
+      return;
+    }
+
+    // Step 2: Check if we got a real Razorpay order ID
+    if (data.razorpay_order_id) {
+      // ── REAL RAZORPAY SDK FLOW ──
+      openRazorpayModal(data);
+    } else if (data.use_payment_link) {
+      // ── FALLBACK: razorpay.me link ──
+      btn.innerHTML = '<i class="fa fa-external-link-alt"></i>&nbsp; Opening Razorpay…';
+      window.open(data.razorpay_me_link + '?amount=' + data.amount_rupees, '_blank');
+      // Show manual confirm
+      setTimeout(() => {
+        if (confirm('Have you completed the payment on Razorpay?\n\nClick OK to confirm your order.')) {
+          document.getElementById('rzp_payment_id').value = 'RZRPAY-ME-MANUAL';
+          document.getElementById('rzp_order_id').value = 'order_me_' + data.order_db_id;
+          document.getElementById('rzp_signature').value = 'manual';
+          // POST as manual payment
+          const cbForm = document.getElementById('paymentCallbackForm');
+          const methodInput = document.createElement('input');
+          methodInput.type = 'hidden';
+          methodInput.name = 'payment_method';
+          methodInput.value = 'razorpay_me';
+          cbForm.appendChild(methodInput);
+          cbForm.submit();
+        } else {
+          btn.innerHTML = '<i class="fa fa-lock"></i>&nbsp; Pay Securely · ₹' + Math.round(currentTotal);
+          btn.disabled = false;
+        }
+      }, 3000);
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Something went wrong. Please try again.');
+    btn.innerHTML = '<i class="fa fa-lock"></i>&nbsp; Pay Securely · ₹' + Math.round(currentTotal);
+    btn.disabled = false;
+  });
+}
+
+// ── Open Razorpay Checkout Modal ──────────────────────────────
+function openRazorpayModal(data) {
+  const btn = document.getElementById('checkoutBtn');
+  const formData = getFormData();
+
+  // Activate step 3 in UI
+  document.getElementById('step3').classList.add('active');
+
+  const options = {
+    key: '{{ razorpay_key_id }}',
+    amount: data.amount,          // in paise
+    currency: data.currency || 'INR',
+    name: 'VORN',
+    description: 'Order #' + (data.order_number || ''),
+    image: '',                    // optional: your logo URL
+    order_id: data.razorpay_order_id,
+    handler: function(response) {
+      // Payment successful — submit to Django for verification
+      document.getElementById('rzp_payment_id').value = response.razorpay_payment_id;
+      document.getElementById('rzp_order_id').value = response.razorpay_order_id;
+      document.getElementById('rzp_signature').value = response.razorpay_signature;
+
+      btn.innerHTML = '<i class="fa fa-check"></i> Payment Successful! Confirming order…';
+      document.getElementById('paymentCallbackForm').submit();
+    },
+    prefill: {
+      name:  formData.full_name  || '',
+      email: formData.email      || '',
+      contact: formData.phone    || '',
+    },
+    theme: {
+      color: '#C9A96E',    // VORN gold
+      backdrop_color: 'rgba(8,8,8,0.9)',
+    },
+    modal: {
+      ondismiss: function() {
+        btn.innerHTML = '<i class="fa fa-lock"></i>&nbsp; Pay Securely · ₹' + Math.round(currentTotal);
+        btn.disabled = false;
+        document.getElementById('step3').classList.remove('active');
+      },
+    },
+  };
+
+  const rzp = new Razorpay(options);
+
+  rzp.on('payment.failed', function(response) {
+    alert('Payment failed: ' + response.error.description);
+    btn.innerHTML = '<i class="fa fa-lock"></i>&nbsp; Pay Securely · ₹' + Math.round(currentTotal);
+    btn.disabled = false;
+  });
+
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Opening Razorpay…';
+  rzp.open();
+}
 </script>
 {% endblock %}

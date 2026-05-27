@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block title %}VORN Size Guide & Fit Assistant{% endblock %}
+{% block content %}
+<div class="page-offset" style="background:var(--black);color:var(--cream);padding-bottom:120px;">
+  <div style="max-width:900px;margin:0 auto;padding:80px 20px;">
+    <!-- Title -->
+    <div style="text-align:center;margin-bottom:60px;">
+      <span class="label-caps" style="color:var(--gold);letter-spacing:0.4em;">Sizing Information</span>
+      <h1 style="font-family:var(--font-heading);font-size:3.5rem;font-weight:300;margin-top:16px;text-transform:uppercase;letter-spacing:0.05em;">
+        Size Guide
+      </h1>
+      <p style="color:var(--gray-400);font-size:0.95rem;margin-top:20px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.7;font-weight:300;">
+        Ensure a perfect fit by matching your measurements to our detailed size specs. VORN garments are designed for structured yet comfortable luxury.
+      </p>
+    </div>
+
+    <!-- Sizing Tabs -->
+    <div style="background:var(--black-card);border:1px solid var(--black-border);padding:40px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--black-border);padding-bottom:20px;margin-bottom:30px;flex-wrap:wrap;gap:20px;">
+        <div style="display:flex;gap:12px;">
+          <button class="btn btn-dark active-tab-btn" id="tab-men-btn" onclick="toggleGuideTab('men')" style="padding:10px 24px;border:1px solid var(--gold);color:var(--gold);">Men</button>
+          <button class="btn btn-dark" id="tab-women-btn" onclick="toggleGuideTab('women')" style="padding:10px 24px;border:1px solid var(--black-border);color:var(--cream);">Women</button>
+        </div>
+        <div style="display:flex;border:1px solid var(--black-border);background:var(--black);">
+          <button id="unit-cm-btn" onclick="toggleGuideUnit('cm')" style="background:var(--black-elevated);color:var(--gold);border:none;padding:8px 16px;cursor:pointer;font-size:0.75rem;font-weight:600;">CM</button>
+          <button id="unit-in-btn" onclick="toggleGuideUnit('in')" style="background:var(--black);color:var(--cream);border:none;padding:8px 16px;cursor:pointer;font-size:0.75rem;">INCHES</button>
+        </div>
+      </div>
+
+      <!-- Men Table -->
+      <div id="table-men">
+        <table class="size-guide-table" style="width:100%;border-collapse:collapse;text-align:left;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--black-border);color:var(--gold);font-family:var(--font-heading);font-size:1.1rem;">
+              <th style="padding:16px 8px;">Size</th>
+              <th style="padding:16px 8px;">Chest</th>
+              <th style="padding:16px 8px;">Waist</th>
+              <th style="padding:16px 8px;">Hip</th>
+              <th style="padding:16px 8px;">Shoulder</th>
+            </tr>
+          </thead>
+          <tbody style="font-weight:300;font-size:0.9rem;color:var(--cream);">
+            <tr style="border-bottom:1px solid var(--black-border);">
+              <td style="padding:16px 8px;font-weight:600;color:var(--white);">XS</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="86" data-in="34">86</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="71" data-in="28">71</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="86" data-in="34">86</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="41" data-in="16">41</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--black-border);">
+              <td style="padding:16px 8px;font-weight:600;color:var(--white);">S</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="91" data-in="36">91</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="76" data-in="30">76</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="91" data-in="36">91</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="43" data-in="17">43</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--black-border);">
+              <td style="padding:16px 8px;font-weight:600;color:var(--white);">M</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="96" data-in="38">96</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="81" data-in="32">81</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="96" data-in="38">96</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="45" data-in="18">45</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--black-border);">
+              <td style="padding:16px 8px;font-weight:600;color:var(--white);">L</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="101" data-in="40">101</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="86" data-in="34">86</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="101" data-in="40">101</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="47" data-in="18.5">47</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--black-border);">
+              <td style="padding:16px 8px;font-weight:600;color:var(--white);">XL</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="106" data-in="42">106</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="91" data-in="36">91</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="106" data-in="42">106</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="49" data-in="19">49</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Women Table -->
+      <div id="table-women" style="display:none;">
+        <table class="size-guide-table" style="width:100%;border-collapse:collapse;text-align:left;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--black-border);color:var(--gold);font-family:var(--font-heading);font-size:1.1rem;">
+              <th style="padding:16px 8px;">Size</th>
+              <th style="padding:16px 8px;">Bust</th>
+              <th style="padding:16px 8px;">Waist</th>
+              <th style="padding:16px 8px;">Hip</th>
+            </tr>
+          </thead>
+          <tbody style="font-weight:300;font-size:0.9rem;color:var(--cream);">
+            <tr style="border-bottom:1px solid var(--black-border);">
+              <td style="padding:16px 8px;font-weight:600;color:var(--white);">XS</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="79" data-in="31">79</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="61" data-in="24">61</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="86" data-in="34">86</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--black-border);">
+              <td style="padding:16px 8px;font-weight:600;color:var(--white);">S</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="84" data-in="33">84</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="66" data-in="26">66</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="91" data-in="36">91</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--black-border);">
+              <td style="padding:16px 8px;font-weight:600;color:var(--white);">M</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="89" data-in="35">89</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="71" data-in="28">71</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="96" data-in="38">96</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--black-border);">
+              <td style="padding:16px 8px;font-weight:600;color:var(--white);">L</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="94" data-in="37">94</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="76" data-in="30">76</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="101" data-in="40">101</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--black-border);">
+              <td style="padding:16px 8px;font-weight:600;color:var(--white);">XL</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="99" data-in="39">99</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="81" data-in="32">81</td>
+              <td style="padding:16px 8px;" class="meas" data-cm="106" data-in="42">106</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let activeGuideTab = 'men';
+  let activeGuideUnit = 'cm';
+
+  function toggleGuideTab(tab) {
+    activeGuideTab = tab;
+    const menBtn = document.getElementById('tab-men-btn');
+    const womenBtn = document.getElementById('tab-women-btn');
+    const menTable = document.getElementById('table-men');
+    const womenTable = document.getElementById('table-women');
+
+    if (tab === 'men') {
+      menTable.style.display = 'block';
+      womenTable.style.display = 'none';
+      menBtn.style.borderColor = 'var(--gold)';
+      menBtn.style.color = 'var(--gold)';
+      womenBtn.style.borderColor = 'var(--black-border)';
+      womenBtn.style.color = 'var(--cream)';
+    } else {
+      menTable.style.display = 'none';
+      womenTable.style.display = 'block';
+      menBtn.style.borderColor = 'var(--black-border)';
+      menBtn.style.color = 'var(--cream)';
+      womenBtn.style.borderColor = 'var(--gold)';
+      womenBtn.style.color = 'var(--gold)';
+    }
+  }
+
+  function toggleGuideUnit(unit) {
+    activeGuideUnit = unit;
+    const cmBtn = document.getElementById('unit-cm-btn');
+    const inBtn = document.getElementById('unit-in-btn');
+
+    if (unit === 'cm') {
+      cmBtn.style.background = 'var(--black-elevated)';
+      cmBtn.style.color = 'var(--gold)';
+      inBtn.style.background = 'var(--black)';
+      inBtn.style.color = 'var(--cream)';
+    } else {
+      cmBtn.style.background = 'var(--black)';
+      cmBtn.style.color = 'var(--cream)';
+      inBtn.style.background = 'var(--black-elevated)';
+      inBtn.style.color = 'var(--gold)';
+    }
+
+    document.querySelectorAll('.meas').forEach(el => {
+      el.textContent = el.getAttribute('data-' + unit);
+    });
+  }
+</script>
+{% endblock %}

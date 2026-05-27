@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}The VORN Edit — SS26 Lookbook{% endblock %}
+{% block meta_description %}Immerse yourself in the VORN SS26 Lookbook — a cinematic showcase of raw geometry, flowing silk, and modern silhouettes.{% endblock %}
+
+{% block content %}
+<div class="page-offset" style="background:var(--black);color:var(--cream);padding-bottom:120px;">
+  <!-- Lookbook Header -->
+  <div style="max-width:1200px;margin:0 auto;padding:80px 20px 40px;text-align:center;">
+    <span class="label-caps" style="color:var(--gold);letter-spacing:0.4em;">Editorial Collection</span>
+    <h1 style="font-family:var(--font-heading);font-size:clamp(2.5rem, 6vw, 5rem);font-weight:300;line-height:1.1;margin-top:20px;text-transform:uppercase;">
+      The VORN Edit <br><em style="color:var(--gold);text-transform:none;">SS26</em>
+    </h1>
+    <p style="font-size:1rem;color:var(--gray-400);max-width:600px;margin:32px auto 0;line-height:1.8;font-weight:300;">
+      A study in contrasts: structural tailoring meets fluid draping. Inspired by architectural lines and natural raw elements, VORN SS26 celebrates the art of deliberate dressing.
+    </p>
+  </div>
+
+  <!-- Full-bleed Hero -->
+  <section style="width:100%;height:85vh;position:relative;overflow:hidden;margin-bottom:80px;background:var(--black-elevated);" class="reveal">
+    <img src="{% static 'images/lookbook_hero.jpg' %}" alt="VORN SS26 Editorial Hero" style="width:100%;height:100%;object-fit:cover;opacity:0.8;">
+    <div style="position:absolute;bottom:40px;left:40px;right:40px;display:flex;justify-content:space-between;align-items:flex-end;z-index:2;flex-wrap:wrap;gap:20px;">
+      <div style="max-width:400px;">
+        <span style="font-size:0.65rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;">Act I — The Core</span>
+        <h2 style="font-family:var(--font-heading);font-size:2.2rem;font-weight:300;color:var(--white);margin-top:8px;">Deliberate Geometry</h2>
+      </div>
+      <div style="font-family:var(--font-heading);font-style:italic;font-size:1.2rem;color:var(--cream);">
+        "Tailoring is the architecture of the body."
+      </div>
+    </div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(250, 248, 245, 0.85) 0%, rgba(250, 248, 245, 0.2) 60%, transparent 100%);pointer-events:none;"></div>
+  </section>
+
+  <!-- Editorial Asymmetric Grid -->
+  <div style="max-width:1400px;margin:0 auto;padding:0 20px;">
+    <div class="editorial-grid-3" style="margin-bottom:120px;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:60px;">
+      <!-- Card 1 -->
+      <div class="reveal reveal-d1">
+        <div style="position:relative;overflow:hidden;aspect-ratio:3/4;background:var(--black-elevated);margin-bottom:20px;">
+          <img src="{% static 'images/category_outerwear.jpg' %}" alt="Outerwear Look" style="width:100%;height:100%;object-fit:cover;transition:transform 0.8s var(--ease);" class="hover-zoom">
+        </div>
+        <span style="font-size:0.65rem;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;">Look 01</span>
+        <h3 style="font-family:var(--font-heading);font-size:1.6rem;font-weight:300;margin-top:8px;color:var(--cream);">The Cashmere Overcoat</h3>
+        <p style="font-size:0.8rem;color:var(--gray-400);line-height:1.7;margin-top:12px;font-weight:300;">
+          Draped structure. Features an oversized silhouette crafted from double-faced Italian wool-cashmere blend.
+        </p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="reveal reveal-d2" style="margin-top:40px;">
+        <div style="position:relative;overflow:hidden;aspect-ratio:3/4;background:var(--black-elevated);margin-bottom:20px;">
+          <img src="{% static 'images/category_shirts.jpg' %}" alt="Shirts Look" style="width:100%;height:100%;object-fit:cover;transition:transform 0.8s var(--ease);" class="hover-zoom">
+        </div>
+        <span style="font-size:0.65rem;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;">Look 02</span>
+        <h3 style="font-family:var(--font-heading);font-size:1.6rem;font-weight:300;margin-top:8px;color:var(--cream);">Fluid Poplin</h3>
+        <p style="font-size:0.8rem;color:var(--gray-400);line-height:1.7;margin-top:12px;font-weight:300;">
+          Unstructured necklines. Crafted from 100% certified organic Egyptian cotton poplin with high-stitch counts.
+        </p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="reveal reveal-d3">
+        <div style="position:relative;overflow:hidden;aspect-ratio:3/4;background:var(--black-elevated);margin-bottom:20px;">
+          <img src="{% static 'images/category_accessories.jpg' %}" alt="Accessories Look" style="width:100%;height:100%;object-fit:cover;transition:transform 0.8s var(--ease);" class="hover-zoom">
+        </div>
+        <span style="font-size:0.65rem;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;">Look 03</span>
+        <h3 style="font-family:var(--font-heading);font-size:1.6rem;font-weight:300;margin-top:8px;color:var(--cream);">Sculpted Hardware</h3>
+        <p style="font-size:0.8rem;color:var(--gray-400);line-height:1.7;margin-top:12px;font-weight:300;">
+          Hand-painted edge details. Bridging functional utility and minimalist ornamentation.
+        </p>
+      </div>
+    </div>
+
+    <!-- Interactive CTA to Shop -->
+    <div class="reveal" style="background:var(--black-card);border:1px solid var(--black-border);padding:80px 40px;text-align:center;">
+      <h2 style="font-family:var(--font-heading);font-size:2.5rem;font-weight:300;color:var(--white);margin-bottom:20px;text-transform:uppercase;letter-spacing:0.1em;">
+        Ready to Explore?
+      </h2>
+      <p style="font-size:0.9rem;color:var(--gray-400);margin-bottom:40px;max-width:500px;margin-left:auto;margin-right:auto;">
+        Translate these runway concepts into your everyday capsule collection.
+      </p>
+      <a href="/shop/" class="btn btn-gold" style="padding:20px 40px;text-transform:uppercase;font-size:0.8rem;letter-spacing:0.2em;">
+        Shop The Collection
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

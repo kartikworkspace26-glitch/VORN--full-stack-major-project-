@@ -8,7 +8,6 @@ urlpatterns = [
     path('', include('store.urls')),
     path('orders/', include('orders.urls')),
     path('accounts/', include('accounts.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
 ]
 
 if settings.DEBUG:

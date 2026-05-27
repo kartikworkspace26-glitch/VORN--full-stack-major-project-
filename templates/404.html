@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Page Not Found — VORN{% endblock %}
+
+{% block content %}
+<div class="page-offset">
+  <div class="section" style="padding: 120px 20px; text-align: center;">
+    <div style="max-width: 600px; margin: 0 auto;">
+      <!-- Logo Emblem or Icon -->
+      <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(201,169,110,0.1); border: 1.5px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--gold); margin: 0 auto 32px;">
+        <i class="fa fa-compass"></i>
+      </div>
+
+      <span class="label-caps" style="color: var(--gold); letter-spacing: 0.35em;">Error 404</span>
+      <h1 style="font-family: var(--font-heading); font-size: 3.5rem; font-weight: 300; margin-top: 16px; text-transform: uppercase;">
+        Page Not Found
+      </h1>
+      
+      <p style="color: var(--gray-400); font-size: 0.95rem; margin-top: 24px; margin-bottom: 48px; line-height: 1.8; font-weight: 300;">
+        The luxury you are seeking has moved or is currently unavailable. Let us guide you back to our curated collections.
+      </p>
+
+      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'home' %}" class="btn btn-gold" style="padding: 16px 36px;">Return Home</a>
+        <a href="{% url 'catalog' %}" class="btn btn-outline" style="padding: 16px 36px;">Shop Catalog</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

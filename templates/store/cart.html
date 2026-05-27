@@ -16,7 +16,8 @@
 
       <!-- Cart Items -->
       <div>
-        <table class="cart-table">
+        <!-- Desktop Table -->
+        <table class="cart-table cart-desktop">
           <thead>
             <tr>
               <th colspan="2">Product</th>
@@ -76,13 +77,54 @@
           </tbody>
         </table>
 
+        <!-- Mobile Card Layout -->
+        <div class="cart-mobile">
+          {% for item in cart_items %}
+          <div class="cart-mobile-card">
+            <div class="cart-mobile-card-top">
+              {% if item.image %}
+              <img src="{{ item.image }}" alt="{{ item.name }}" class="cart-mobile-img">
+              {% else %}
+              <div class="cart-mobile-img" style="display:flex;align-items:center;justify-content:center;background:var(--black-elevated);">
+                <span style="font-family:var(--font-heading);color:rgba(201,169,110,0.3);font-size:0.7rem;">VORN</span>
+              </div>
+              {% endif %}
+              <div style="flex:1;min-width:0;">
+                <div style="font-family:var(--font-heading);font-size:1.05rem;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ item.name }}</div>
+                <div style="font-size:0.75rem;color:var(--gray-400);margin-bottom:6px;">
+                  Size: <span style="color:var(--gold);font-weight:600;">{{ item.size|default:"Free Size" }}</span>
+                  {% if item.color %} · {{ item.color }}{% endif %}
+                </div>
+                <div style="font-size:0.88rem;font-weight:600;">₹{{ item.price }}</div>
+              </div>
+              <a href="{% url 'remove_from_cart' item.key %}"
+                 style="color:var(--gray-500);font-size:1.1rem;flex-shrink:0;padding:4px;"
+                 title="Remove item">
+                <i class="fa fa-times"></i>
+              </a>
+            </div>
+            <div class="cart-mobile-card-bottom">
+              <form method="post" action="{% url 'update_cart' item.key %}" style="display:inline;">
+                {% csrf_token %}
+                <div class="qty-control">
+                  <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}" class="qty-btn">−</button>
+                  <span class="qty-display">{{ item.quantity }}</span>
+                  <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}" class="qty-btn">+</button>
+                </div>
+              </form>
+              <span style="color:var(--gold);font-weight:700;font-size:1.05rem;">₹{{ item.subtotal }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
         <div style="display:flex;gap:12px;margin-top:28px;align-items:center;flex-wrap:wrap;">
           <a href="{% url 'catalog' %}" class="btn btn-ghost btn-sm">← Continue Shopping</a>
           <span style="font-size:0.75rem;color:var(--gray-500);">Changes save automatically</span>
         </div>
 
         <!-- Coupon banner on cart page -->
-        <div style="margin-top:32px;padding:20px 24px;background:var(--black-elevated);border:1px dashed var(--black-border-light);display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div class="cart-coupon-banner">
           <i class="fa fa-tag" style="color:var(--gold);"></i>
           <span style="font-size:0.8rem;color:var(--gray-400);">Have a coupon? Apply it at checkout.</span>
           <span style="font-size:0.75rem;color:var(--gold);margin-left:auto;">Try: VORN10 · WELCOME20 · FLAT500</span>

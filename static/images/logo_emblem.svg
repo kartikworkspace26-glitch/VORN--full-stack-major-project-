@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C1A270" />
+      <stop offset="50%" stop-color="#AC8A53" />
+      <stop offset="100%" stop-color="#7A6034" />
+    </linearGradient>
+  </defs>
+  <style>
+    .mono {
+      font-family: 'Cormorant Garamond', 'Georgia', serif;
+      font-size: 120px;
+      font-weight: 300;
+      fill: url(#gold-grad);
+      text-anchor: middle;
+    }
+    .ring {
+      fill: none;
+      stroke: url(#gold-grad);
+      stroke-width: 1.5;
+      stroke-dasharray: 4, 4;
+    }
+  </style>
+  <circle cx="100" cy="100" r="86" class="ring" />
+  <circle cx="100" cy="100" r="92" stroke="url(#gold-grad)" stroke-width="0.5" fill="none" />
+  <text x="97" y="138" class="mono">V</text>
+</svg>

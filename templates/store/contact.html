@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Contact & Help — VORN{% endblock %}
+
+{% block content %}
+<div class="page-offset">
+  <div class="page-hero">
+    <span class="label-caps">Customer Care</span>
+    <h1 class="heading-lg" style="margin-top:12px;">Contact & Support</h1>
+    <p style="color:var(--gray-400);font-size:0.95rem;margin-top:20px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.7;font-weight:300;">
+      We are here to assist you with inquiries regarding orders, products, sizing, returns, or bespoke styling services.
+    </p>
+  </div>
+
+  <div class="section" style="padding-top:48px;">
+    <div class="contact-grid-container" style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;max-width:1200px;margin:0 auto;">
+      
+      <!-- Contact Form -->
+      <div style="background:var(--black-card);border:1px solid var(--black-border);padding:40px;">
+        <h2 style="font-family:var(--font-heading);font-size:1.8rem;margin-bottom:28px;text-transform:uppercase;letter-spacing:0.05em;">Send an Inquiry</h2>
+        
+        <form method="post" action="" onsubmit="alert('Thank you for contacting VORN. We will respond shortly.'); return false;">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" placeholder="e.g. Puran Rai" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-control" placeholder="yourname@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <input type="text" class="form-control" placeholder="e.g. Order Status, Fit Assistance" required>
+          </div>
+          <div class="form-group" style="margin-bottom:28px;">
+            <label class="form-label">Message</label>
+            <textarea class="form-control" rows="5" placeholder="How can we assist you?" style="resize:vertical;" required></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-gold btn-full" style="padding:16px;">
+            Submit Inquiry
+          </button>
+        </form>
+      </div>
+
+      <!-- Support & Help Information -->
+      <div style="display:flex;flex-direction:column;gap:36px;">
+        
+        <!-- General Inquiries -->
+        <div>
+          <h3 style="font-family:var(--font-heading);font-size:1.4rem;color:var(--gold);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.05em;">General Inquiries</h3>
+          <p style="font-size:0.9rem;color:var(--gray-400);line-height:1.75;font-weight:300;">
+            Email: <a href="mailto:hello@vorn.in" style="color:var(--cream);text-decoration:underline;text-underline-offset:2px;">hello@vorn.in</a><br>
+            Hours: Monday – Saturday, 10:00 AM – 7:00 PM IST
+          </p>
+        </div>
+
+        <!-- WhatsApp Support -->
+        <div id="whatsapp" style="padding-top:12px;border-top:1px solid var(--black-border-light);">
+          <h3 style="font-family:var(--font-heading);font-size:1.4rem;color:var(--gold);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.05em;">WhatsApp Support</h3>
+          <p style="font-size:0.9rem;color:var(--gray-400);line-height:1.75;font-weight:300;">
+            For immediate help with order placement, sizing, or styling advice, connect with our support agents:<br>
+            Phone: <strong style="color:var(--cream);">+91 98765 43210</strong>
+          </p>
+        </div>
+
+        <!-- Shipping & Delivery -->
+        <div id="shipping" style="padding-top:12px;border-top:1px solid var(--black-border-light);">
+          <h3 style="font-family:var(--font-heading);font-size:1.4rem;color:var(--gold);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.05em;">Shipping & Delivery</h3>
+          <p style="font-size:0.9rem;color:var(--gray-400);line-height:1.75;font-weight:300;">
+            We offer complimentary standard shipping on all orders over ₹999. For orders below this threshold, a flat shipping charge of ₹99 applies.<br>
+            Estimated delivery timeline: 3–7 business days.
+          </p>
+        </div>
+
+        <!-- Returns & Exchanges -->
+        <div id="returns" style="padding-top:12px;border-top:1px solid var(--black-border-light);">
+          <h3 style="font-family:var(--font-heading);font-size:1.4rem;color:var(--gold);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.05em;">Returns & Exchanges</h3>
+          <p style="font-size:0.9rem;color:var(--gray-400);line-height:1.75;font-weight:300;">
+            We accept returns and exchanges on unworn, unwashed garments within 30 days of delivery. Perfumes must remain sealed in their original packaging.<br>
+            To initiate a request, please email <a href="mailto:returns@vorn.in" style="color:var(--cream);text-decoration:underline;">returns@vorn.in</a> with your Order Number.
+          </p>
+        </div>
+
+        <!-- Care Instructions -->
+        <div id="care" style="padding-top:12px;border-top:1px solid var(--black-border-light);">
+          <h3 style="font-family:var(--font-heading);font-size:1.4rem;color:var(--gold);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.05em;">Care Instructions</h3>
+          <p style="font-size:0.9rem;color:var(--gray-400);line-height:1.75;font-weight:300;">
+            VORN creations are crafted from premium organic fabrics, raw silks, and pure cashmere. To protect their texture and longevity, we recommend professional dry cleaning or delicate hand washing with mild detergents.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+@media (max-width: 900px) {
+  .page-offset .section > div[style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 48px !important;
+  }
+}
+</style>
+{% endblock %}

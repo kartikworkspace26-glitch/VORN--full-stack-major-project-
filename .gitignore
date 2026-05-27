@@ -1,0 +1,44 @@
+# Django
+*.pyc
+__pycache__/
+celerybeat-schedule
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Environments
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs & Editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# System & OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Sensitive keys and payment details
+rzp-key*.csv
+*.key
+*.pem
+
+# Logs & temp files
+*.log
+tmp/
+temp/

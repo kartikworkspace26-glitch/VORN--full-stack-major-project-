@@ -3,6 +3,84 @@
 {% block title %}{% if active_category %}{{ active_category.name }}{% elif query %}Search: {{ query }}{% else %}Shop All{% endif %} — VORN{% endblock %}
 
 {% block content %}
+<style>
+/* Responsive filter styles and mobile-only settings */
+.mobile-only {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .mobile-only {
+    display: inline-flex !important;
+  }
+  
+  /* Filter Sidebar as a Slide-out Drawer */
+  .filter-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 320px !important;
+    max-width: 85vw !important;
+    z-index: 1100 !important;
+    background: var(--black-card) !important;
+    border: none !important;
+    border-right: 1px solid var(--black-border) !important;
+    padding: 24px !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.4s var(--ease) !important;
+    overflow-y: auto !important;
+    box-shadow: var(--shadow-lg) !important;
+  }
+  
+  .filter-sidebar.active {
+    transform: translateX(0) !important;
+  }
+  
+  /* Filter Overlay */
+  .filter-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1099;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s var(--ease), visibility 0.4s var(--ease);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  
+  .filter-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .filter-mobile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--black-border);
+  }
+  
+  .filter-close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--white);
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s;
+  }
+  
+  .filter-close-btn:hover {
+    color: var(--gold);
+  }
+}
+</style>
+
 <div class="page-offset">
 
   <!-- Page Hero -->
@@ -24,7 +102,13 @@
     <div class="catalog-layout">
 
       <!-- ─── FILTER SIDEBAR ───────────────────────── -->
+      <div id="filter-overlay" class="filter-overlay" onclick="toggleMobileFilter(false)"></div>
       <aside class="filter-sidebar" id="filterSidebar">
+        <!-- Mobile Close Header -->
+        <div class="filter-mobile-header mobile-only">
+          <span style="font-family:var(--font-heading);font-size:1.2rem;font-weight:400;color:var(--white);">Filters</span>
+          <button type="button" class="filter-close-btn" onclick="toggleMobileFilter(false)">&times;</button>
+        </div>
         <div class="filter-section">
           <div class="filter-title">Categories</div>
           <div class="filter-pills" style="flex-direction:column;gap:6px;">
@@ -87,6 +171,10 @@
             <span style="color:var(--gray-400);"> product{{ products|length|pluralize }}</span>
           </span>
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <!-- Mobile Filter Toggle Button -->
+            <button id="mobile-filter-btn" class="btn btn-outline btn-sm mobile-only" onclick="toggleMobileFilter(true)">
+              <i class="fa fa-filter" style="margin-right: 6px;"></i> Filters
+            </button>
             <select class="sort-select" onchange="window.location=this.value" aria-label="Sort by">
               {% for val,label in sort_options.items %}
               <option value="{% url 'catalog' %}?sort={{ val }}{% if active_category %}&category={{ active_category.slug }}{% endif %}{% if gender_filter %}&gender={{ gender_filter }}{% endif %}"
@@ -150,6 +238,22 @@
 </div>
 
 <script>
+function toggleMobileFilter(show) {
+  const sidebar = document.getElementById('filterSidebar');
+  const overlay = document.getElementById('filter-overlay');
+  if (sidebar && overlay) {
+    if (show) {
+      sidebar.classList.add('active');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    } else {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }
+}
+
 function setView(mode, btn) {
   const grid = document.getElementById('productGrid');
   if (!grid) return;

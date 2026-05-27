@@ -13,10 +13,24 @@
       <span class="label-caps" style="display:block;margin-bottom:12px;">Order Confirmed</span>
       <h1 class="success-title">Thank You!</h1>
       <p class="success-subtitle">
-        Your order <strong style="color:var(--gold);">#{{ order.order_number }}</strong> has been placed successfully.<br>
-        A confirmation will be sent to <strong>{{ order.email }}</strong>.
+        Your order <strong style="color:var(--gold);">#{{ order.order_number }}</strong> has been placed successfully.
+        {% if email_sent %}
+        <br><i class="fa fa-envelope" style="color:var(--success);"></i>
+        A confirmation email has been sent to <strong>{{ order.email }}</strong>.
+        {% else %}
+        <br>A confirmation will be sent to <strong>{{ order.email }}</strong>.
+        {% endif %}
       </p>
 
+      <!-- Email Sent Badge -->
+      {% if email_sent %}
+      <div style="background:rgba(76,175,125,0.08);border:1px solid var(--success);padding:14px 20px;margin-bottom:28px;display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <i class="fa fa-check-circle" style="color:var(--success);font-size:1.1rem;"></i>
+        <span style="font-size:0.85rem;color:var(--success);font-weight:600;">Confirmation email sent to {{ order.email }}</span>
+      </div>
+      {% endif %}
+
+      <!-- Order Quick Info -->
       <div class="order-details-grid">
         <div class="order-detail-item">
           <label>Order Number</label>
@@ -38,32 +52,87 @@
         </div>
       </div>
 
-      <!-- Order Items -->
+      <!-- ═══ ITEMS ORDERED ═══ -->
       <div style="text-align:left;background:var(--black-card);border:1px solid var(--black-border);padding:24px;margin:24px 0;">
         <div style="font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;font-weight:700;">Items Ordered</div>
-        {% for item in order.items.all %}
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--black-border);">
-          <div>
-            <div style="font-size:0.9rem;">{{ item.product_name }}</div>
-            <div style="font-size:0.72rem;color:var(--gray-400);">{{ item.size }} · Qty {{ item.quantity }}</div>
+        {% for item in items %}
+        <div class="success-item-row">
+          {% if item.product and item.product.primary_image %}
+          <img src="{{ item.product.primary_image.image.url }}" alt="{{ item.product_name }}" class="success-item-img">
+          {% else %}
+          <div class="success-item-img" style="display:flex;align-items:center;justify-content:center;background:var(--black-elevated);">
+            <span style="font-size:0.6rem;color:var(--gold);">VORN</span>
           </div>
-          <div style="color:var(--gold);font-weight:600;">₹{{ item.subtotal }}</div>
+          {% endif %}
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:var(--font-heading);font-size:1.05rem;margin-bottom:4px;">{{ item.product_name }}</div>
+            <div style="font-size:0.75rem;color:var(--gray-400);">
+              Size: {{ item.size|default:"Free Size" }} · Qty: {{ item.quantity }}
+              {% if item.color %} · Color: {{ item.color }}{% endif %}
+            </div>
+            <div style="font-size:0.78rem;color:var(--gray-400);margin-top:4px;">₹{{ item.price }} each</div>
+          </div>
+          <div style="font-family:var(--font-heading);font-size:1.2rem;color:var(--gold);flex-shrink:0;">₹{{ item.subtotal }}</div>
         </div>
         {% endfor %}
-        <div style="display:flex;justify-content:space-between;padding:14px 0 0;font-weight:700;">
-          <span class="label-caps">Total</span>
-          <span style="font-family:var(--font-heading);font-size:1.3rem;color:var(--gold);">₹{{ order.total }}</span>
+
+        <!-- Pricing Breakdown -->
+        <div style="border-top:1px solid var(--black-border);margin-top:16px;padding-top:16px;">
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.88rem;">
+            <span style="color:var(--gray-400);">Subtotal</span>
+            <span>₹{{ order.subtotal }}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.88rem;">
+            <span style="color:var(--gray-400);">Shipping</span>
+            <span>{% if order.shipping_charge == 0 %}<span style="color:var(--success);">Free ✓</span>{% else %}₹{{ order.shipping_charge }}{% endif %}</span>
+          </div>
+          {% if order.discount %}
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.88rem;">
+            <span style="color:var(--success);">Discount</span>
+            <span style="color:var(--success);">−₹{{ order.discount }}</span>
+          </div>
+          {% endif %}
+          <div style="display:flex;justify-content:space-between;padding:14px 0 0;font-weight:700;border-top:1px solid var(--black-border);margin-top:8px;">
+            <span class="label-caps">Total</span>
+            <span style="font-family:var(--font-heading);font-size:1.3rem;color:var(--gold);">₹{{ order.total }}</span>
+          </div>
         </div>
       </div>
 
-      <!-- Delivery Info -->
-      <div style="background:rgba(201,169,110,0.05);border:1px solid rgba(201,169,110,0.2);padding:20px 24px;margin-bottom:32px;text-align:left;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-          <i class="fa fa-truck" style="color:var(--gold);"></i>
-          <span style="font-size:0.72rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Expected Delivery</span>
+      <!-- ═══ DELIVERY ESTIMATE ═══ -->
+      <div style="background:rgba(201,169,110,0.05);border:1px solid rgba(201,169,110,0.2);padding:24px;margin-bottom:24px;text-align:left;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <i class="fa fa-truck" style="color:var(--gold);font-size:1.1rem;"></i>
+          <span style="font-size:0.72rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Estimated Delivery</span>
         </div>
-        <p style="font-size:0.85rem;color:var(--gray-400);">3–5 business days to {{ order.city }}, {{ order.state }} — {{ order.pincode }}</p>
-        <p style="font-size:0.78rem;color:var(--gray-500);margin-top:4px;">Tracking details will be shared via email once dispatched.</p>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+          <span style="font-family:var(--font-heading);font-size:1.6rem;color:var(--cream);">
+            {{ delivery_min|date:"d M" }} – {{ delivery_max|date:"d M Y" }}
+          </span>
+          <span style="font-size:0.82rem;color:var(--gold);font-weight:600;">({{ delivery_days_min }}–{{ delivery_days_max }} business days)</span>
+        </div>
+        <p style="font-size:0.85rem;color:var(--gray-400);margin-bottom:4px;">
+          <i class="fa fa-map-marker-alt" style="color:var(--gold);width:16px;"></i>
+          {{ order.address_line1 }}{% if order.address_line2 %}, {{ order.address_line2 }}{% endif %},
+          {{ order.city }}, {{ order.state }} — {{ order.pincode }}
+        </p>
+        <p style="font-size:0.78rem;color:var(--gray-500);margin-top:8px;">
+          <i class="fa fa-info-circle" style="color:var(--gold);width:16px;"></i>
+          Tracking details will be shared via email once dispatched.
+        </p>
+      </div>
+
+      <!-- ═══ SHIPPING ADDRESS ═══ -->
+      <div style="background:var(--black-card);border:1px solid var(--black-border);padding:24px;margin-bottom:32px;text-align:left;">
+        <div style="font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;font-weight:700;">Shipping Address</div>
+        <p style="font-size:0.88rem;line-height:1.9;color:var(--gray-400);">
+          <strong style="color:var(--cream);">{{ order.full_name }}</strong><br>
+          {{ order.address_line1 }}<br>
+          {% if order.address_line2 %}{{ order.address_line2 }}<br>{% endif %}
+          {{ order.city }}, {{ order.state }} — {{ order.pincode }}<br>
+          <i class="fa fa-phone" style="color:var(--gold);width:16px;"></i> {{ order.phone }}<br>
+          <i class="fa fa-envelope" style="color:var(--gold);width:16px;"></i> {{ order.email }}
+        </p>
       </div>
 
       <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
@@ -84,5 +153,30 @@
   100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 .success-icon { animation: checkmark 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s both; }
+.success-item-row {
+  display: flex;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--black-border);
+  align-items: center;
+}
+.success-item-img {
+  width: 64px;
+  height: 80px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+@media (max-width: 600px) {
+  .success-item-row {
+    gap: 12px;
+  }
+  .success-item-img {
+    width: 52px;
+    height: 66px;
+  }
+  .success-item-row > div:last-child {
+    font-size: 1rem !important;
+  }
+}
 </style>
 {% endblock %}

@@ -44,9 +44,14 @@
     <div style="text-align:center;margin-top:0;">
       <div class="label-caps" style="margin-bottom:20px;">Popular Searches</div>
       <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
-        {% for term in "Oxford Shirt,Overcoat,Merino,Trousers,Chelsea Boot,Linen,Wallet,Pocket Square"|split:"," %}
-        <a href="{% url 'search' %}?q={{ term }}" class="filter-pill" style="font-size:0.72rem;">{{ term }}</a>
-        {% endfor %}
+        <a href="{% url 'search' %}?q=Oxford Shirt" class="filter-pill" style="font-size:0.72rem;">Oxford Shirt</a>
+        <a href="{% url 'search' %}?q=Overcoat" class="filter-pill" style="font-size:0.72rem;">Overcoat</a>
+        <a href="{% url 'search' %}?q=Merino" class="filter-pill" style="font-size:0.72rem;">Merino</a>
+        <a href="{% url 'search' %}?q=Trousers" class="filter-pill" style="font-size:0.72rem;">Trousers</a>
+        <a href="{% url 'search' %}?q=Chelsea Boot" class="filter-pill" style="font-size:0.72rem;">Chelsea Boot</a>
+        <a href="{% url 'search' %}?q=Linen" class="filter-pill" style="font-size:0.72rem;">Linen</a>
+        <a href="{% url 'search' %}?q=Wallet" class="filter-pill" style="font-size:0.72rem;">Wallet</a>
+        <a href="{% url 'search' %}?q=Pocket Square" class="filter-pill" style="font-size:0.72rem;">Pocket Square</a>
       </div>
     </div>
     {% endif %}
