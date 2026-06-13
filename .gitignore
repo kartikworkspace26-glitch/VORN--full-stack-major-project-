@@ -7,7 +7,7 @@ db.sqlite3-journal
 media/
 staticfiles/
 
-# Environments
+# Environments — NEVER commit these
 .env
 .env.local
 .env.development
@@ -26,19 +26,44 @@ env/
 *.njsproj
 *.sln
 *.swp
+*.orig
 
 # System & OS files
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 .DS_Store
+**/.DS_Store
 
-# Sensitive keys and payment details
+# Sensitive keys and payment details — NEVER commit these
 rzp-key*.csv
 *.key
 *.pem
+secrets.json
 
 # Logs & temp files
 *.log
 tmp/
 temp/
+
+# Build artifacts
+node_modules/
+dist/
+.cache/
+*.egg-info/
+.eggs/
+build/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Pytest / test
+.pytest_cache/
+.tox/
+
+# Render
+.render-build-dir/

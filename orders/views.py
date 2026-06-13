@@ -7,6 +7,8 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from .models import Order, OrderItem, Coupon
 
 
@@ -97,9 +99,17 @@ def create_order_from_cart(request, data, payment_method='razorpay_me'):
     order.save()
 
     for key, item in cart.items():
+        # Safe check to avoid database IntegrityError (500) if product was deleted/re-seeded
+        from store.models import Product
+        try:
+            prod = Product.objects.get(id=item['product_id'])
+            prod_id = prod.id
+        except Product.DoesNotExist:
+            prod_id = None
+
         OrderItem.objects.create(
             order=order,
-            product_id=item['product_id'],
+            product_id=prod_id,
             product_name=item['name'],
             size=item.get('size', ''),
             color=item.get('color', ''),
@@ -298,8 +308,8 @@ def payment_callback(request):
     razorpay_signature  = data.get('razorpay_signature', '')
 
     # Verify signature
-    key_secret = settings.RAZORPAY_KEY_SECRET.encode()
-    message = f"{razorpay_order_id}|{razorpay_payment_id}".encode()
+    key_secret = settings.RAZORPAY_KEY_SECRET.encode('utf-8')
+    message = f"{razorpay_order_id}|{razorpay_payment_id}".encode('utf-8')
     generated = hmac.new(key_secret, message, hashlib.sha256).hexdigest()
 
     if generated == razorpay_signature or settings.RAZORPAY_KEY_SECRET == 'placeholder_secret':
@@ -383,12 +393,15 @@ def order_success(request, order_number):
             )
 
             # HTML email using template
-            html_body = render_to_string('orders/email_order_confirmation.html', {
-                'order': order,
-                'items': items,
-                'delivery_min': delivery_min,
-                'delivery_max': delivery_max,
-            })
+            try:
+                html_body = render_to_string('orders/email_order_confirmation.html', {
+                    'order': order,
+                    'items': items,
+                    'delivery_min': delivery_min,
+                    'delivery_max': delivery_max,
+                })
+            except Exception:
+                html_body = plain_body
 
             msg = EmailMultiAlternatives(
                 subject=f'VORN — Order Confirmed #{order.order_number}',

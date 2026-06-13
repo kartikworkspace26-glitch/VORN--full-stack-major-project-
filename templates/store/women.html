@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Women's Collection — VORN | Refined Luxury Womenswear{% endblock %}
+{% block meta_description %}Explore VORN's Women's Collection. Flowing dresses, silk tops, cashmere knitwear, refined outerwear, and exclusive fragrances crafted for the discerning woman.{% endblock %}
+
+{% block content %}
+
+<!-- ── Hero ────────────────────────────────────────────────────────── -->
+<section class="gender-hero">
+  <div class="gender-hero-bg">
+    <img src="{% static 'images/womens_hero_banner.png' %}" alt="VORN Women's Collection"
+         loading="eager" fetchpriority="high">
+  </div>
+  <div class="gender-hero-overlay"></div>
+  <div class="gender-hero-content">
+    <div class="gender-hero-eyebrow">The VORN Edit — Women</div>
+    <h1 class="gender-hero-title">Women's<br>Collection</h1>
+    <p class="gender-hero-subtitle">
+      Grace meets intention. Pieces that exist between the timeless and
+      the contemporary — designed for a woman who defines her own moment.
+    </p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <a href="#women-catalog" class="btn btn-gold btn-lg">
+        <i class="fa fa-arrow-down" style="margin-right:10px;"></i>Shop Now
+      </a>
+      <a href="#women-perfumes" class="btn btn-outline btn-lg">
+        <i class="fa fa-spray-can-sparkles" style="margin-right:8px;"></i>Perfumes
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Sticky Category Filter Strip ──────────────────────────────── -->
+<div class="gender-filter-strip" id="women-catalog">
+  <span style="font-size:0.58rem;letter-spacing:0.2em;color:var(--gray-500);text-transform:uppercase;margin-right:8px;flex-shrink:0;">Filter:</span>
+  <div style="display:flex;gap:6px;overflow-x:auto;flex:1;scrollbar-width:none;padding:4px 0;">
+    <a href="/shop/women/" class="gender-filter-pill {% if not active_category %}active{% endif %}">All</a>
+    <a href="/shop/women/?category=dresses" class="gender-filter-pill {% if active_category.slug == 'dresses' %}active{% endif %}">Dresses</a>
+    <a href="/shop/women/?category=tops" class="gender-filter-pill {% if active_category.slug == 'tops' %}active{% endif %}">Tops</a>
+    <a href="/shop/women/?category=suits" class="gender-filter-pill {% if active_category.slug == 'suits' %}active{% endif %}">Suits</a>
+    <a href="/shop/women/?category=outerwear" class="gender-filter-pill {% if active_category.slug == 'outerwear' %}active{% endif %}">Outerwear</a>
+    <a href="/shop/women/?category=knitwear" class="gender-filter-pill {% if active_category.slug == 'knitwear' %}active{% endif %}">Knitwear</a>
+    <a href="/shop/women/?category=trousers" class="gender-filter-pill {% if active_category.slug == 'trousers' %}active{% endif %}">Trousers</a>
+    <a href="/shop/women/?category=footwear" class="gender-filter-pill {% if active_category.slug == 'footwear' %}active{% endif %}">Footwear</a>
+    <a href="/shop/women/?category=accessories" class="gender-filter-pill {% if active_category.slug == 'accessories' %}active{% endif %}">Accessories</a>
+    <a href="#women-perfumes" class="gender-filter-pill" style="flex-shrink:0;">Perfumes ✦</a>
+  </div>
+  <div style="margin-left:12px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
+    <select class="sort-select" onchange="window.location=this.value" aria-label="Sort by"
+      style="background:var(--black-card);border:1px solid var(--black-border);color:var(--cream);padding:7px 12px;font-size:0.6rem;letter-spacing:0.1em;outline:none;cursor:pointer;">
+      {% for val,label in sort_options.items %}
+      <option value="/shop/women/?sort={{ val }}{% if active_category %}&category={{ active_category.slug }}{% endif %}"
+        {% if current_sort == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+
+<!-- ── Featured Picks ─────────────────────────────────────────────── -->
+{% if featured %}
+<div class="section" style="padding-bottom:0;">
+  <div class="section-header" style="text-align:left;">
+    <span class="section-eyebrow">Editor's Picks</span>
+    <h2 class="section-title">Featured for You</h2>
+  </div>
+  <div class="product-grid" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));">
+    {% for p in featured %}
+    {% include 'store/_product_card.html' with product=p %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- ── Full Product Grid ───────────────────────────────────────────── -->
+<div class="gender-catalog-grid">
+
+  {% if active_category %}
+  <div style="margin-bottom:32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <span class="section-eyebrow">Women / {{ active_category.name }}</span>
+      <strong style="color:var(--gold);">{{ products|length }}</strong>
+      <span style="color:var(--gray-400);font-size:0.85rem;"> product{{ products|length|pluralize }}</span>
+    </div>
+    <a href="/shop/women/" style="font-size:0.6rem;letter-spacing:0.15em;color:var(--gray-400);text-transform:uppercase;border-bottom:1px solid var(--black-border);">
+      ← Clear filter
+    </a>
+  </div>
+  {% else %}
+  <div style="margin-bottom:32px;">
+    <span class="section-eyebrow" style="margin-bottom:0;">All Women's Products</span>
+    <span style="color:var(--gray-400);font-size:0.85rem;"> {{ products|length }} item{{ products|length|pluralize }}</span>
+  </div>
+  {% endif %}
+
+  {% if products %}
+  <div class="product-grid" id="women-product-grid">
+    {% for p in products %}
+    {% include 'store/_product_card.html' with product=p %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state" style="min-height:40vh;">
+    <div class="empty-state-icon"><i class="fa fa-vest-patches"></i></div>
+    <h2>No products found</h2>
+    <p>Try a different category or browse the full collection.</p>
+    <a href="/shop/women/" class="btn btn-gold">View All Women's</a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- ── Silk & Soft Power Editorial ───────────────────────────────── -->
+<section style="position:relative;min-height:50vh;display:flex;align-items:center;overflow:hidden;">
+  <div style="position:absolute;inset:0;">
+    <img src="{% static 'images/womens_evening_gown.jpg' %}" alt="Women's Dresses"
+         style="width:100%;height:100%;object-fit:cover;filter:brightness(0.38);" loading="lazy">
+  </div>
+  <div style="position:absolute;inset:0;background:linear-gradient(to right, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.2) 60%);"></div>
+  <div style="position:relative;z-index:2;padding:clamp(40px,6vw,80px);max-width:600px;">
+    <span class="section-eyebrow" style="color:var(--gold);">The New Season</span>
+    <h2 style="font-family:var(--font-heading);font-size:clamp(2rem,5vw,4rem);color:#fff;font-weight:300;line-height:1.05;margin-bottom:20px;">
+      Silk &amp;<br>Soft Power
+    </h2>
+    <p style="color:rgba(255,255,255,0.7);font-size:0.95rem;line-height:1.8;margin-bottom:28px;max-width:380px;">
+      Our silk collection is an ode to effortless elegance. Bias-cut silhouettes that move with intention. Woven for moments that matter.
+    </p>
+    <a href="/shop/women/?category=dresses" class="btn btn-gold">Shop Dresses</a>
+  </div>
+</section>
+
+<!-- ── Cashmere Edit ──────────────────────────────────────────────── -->
+<div class="section">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,3vw,48px);align-items:center;max-width:1200px;margin:0 auto;">
+    <div>
+      <span class="section-eyebrow">The Cashmere Edit</span>
+      <h2 class="section-title" style="margin-bottom:20px;">Warmth,<br>Redefined</h2>
+      <p style="color:var(--gray-400);font-size:0.95rem;line-height:1.8;margin-bottom:28px;max-width:400px;">
+        Our cashmere knitwear is sourced from the finest Mongolian pashmina. Every stitch is an heirloom. Styles that outlast seasons.
+      </p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="/shop/women/?category=knitwear" class="btn btn-outline">Shop Knitwear</a>
+        <a href="/shop/women/?category=outerwear" class="btn btn-ghost">Outerwear →</a>
+      </div>
+    </div>
+    <div style="position:relative;aspect-ratio:4/5;overflow:hidden;">
+      <img src="{% static 'images/womens_cashmere_knitwear.jpg' %}" alt="Women's Cashmere"
+           style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     WOMEN'S PERFUMES SECTION (Exclusive)
+     ══════════════════════════════════════════════════════════════════ -->
+<section id="women-perfumes" style="
+  padding: clamp(60px,8vw,120px) clamp(20px,5vw,80px);
+  background: var(--black-soft);
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid var(--black-border);
+">
+  <!-- Atmospheric background -->
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%, rgba(201,169,110,0.06) 0%, transparent 60%);pointer-events:none;"></div>
+  <div style="position:absolute;top:0;right:0;font-family:var(--font-heading);font-size:clamp(6rem,14vw,16rem);font-weight:700;color:rgba(201,169,110,0.03);line-height:1;pointer-events:none;user-select:none;letter-spacing:-0.04em;">SCENT</div>
+
+  <div style="max-width:1400px;margin:0 auto;position:relative;">
+    <!-- Section Header -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;flex-wrap:wrap;gap:16px;">
+      <div>
+        <span class="section-eyebrow reveal" style="color:var(--gold);">Exclusively For Her</span>
+        <h2 class="section-title reveal reveal-d1">Women's<br>Perfumes</h2>
+        <p class="reveal reveal-d2" style="color:var(--gray-400);font-size:0.9rem;line-height:1.8;max-width:440px;margin-top:12px;">
+          Fragrances curated for the modern woman. From fresh citrus florals to deep rose oud — each scent tells its own story.
+        </p>
+      </div>
+      <a href="/shop/women/?category=perfumes" class="btn btn-outline reveal">Explore All →</a>
+    </div>
+
+    <!-- Perfume Cards (horizontal scroll on mobile, grid on desktop) -->
+    <div style="
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    " id="women-perfume-grid">
+
+      <!-- Hardcoded women's perfume showcase cards — these display the actual DB products -->
+      {% with women_perfumes=products %}
+      {% for p in products %}
+        {% if p.category.slug == 'perfumes' %}
+        <!-- Perfume Card -->
+        <div style="
+          background: var(--black-card);
+          border: 1px solid var(--black-border);
+          overflow: hidden;
+          transition: all 0.4s var(--ease);
+          cursor: pointer;
+          position: relative;
+        "
+        onmouseenter="this.style.borderColor='var(--gold)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 48px rgba(201,169,110,0.08)'"
+        onmouseleave="this.style.borderColor='var(--black-border)';this.style.transform='translateY(0)';this.style.boxShadow='none'"
+        onclick="window.location.href='/product/{{ p.slug }}/'">
+
+          <!-- Image -->
+          <div style="aspect-ratio:1/1;overflow:hidden;background:var(--black-elevated);position:relative;">
+            {% if p.primary_image %}
+            <img src="{{ p.primary_image.image.url }}" alt="{{ p.name }}"
+                 style="width:100%;height:100%;object-fit:cover;transition:transform 0.6s var(--ease);"
+                 onmouseenter="this.style.transform='scale(1.06)'"
+                 onmouseleave="this.style.transform='scale(1)'"
+                 loading="lazy">
+            {% else %}
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+              <i class="fa fa-spray-can-sparkles" style="font-size:3rem;color:var(--gold);opacity:0.4;"></i>
+            </div>
+            {% endif %}
+
+            <!-- Exclusive badge -->
+            <div style="position:absolute;top:12px;left:12px;">
+              <span style="font-size:0.5rem;letter-spacing:0.2em;text-transform:uppercase;background:var(--gold);color:var(--black);padding:4px 10px;font-weight:600;">For Her</span>
+            </div>
+          </div>
+
+          <!-- Info -->
+          <div style="padding:24px;">
+            <div style="font-size:0.55rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Women's Fragrance</div>
+            <h3 style="font-family:var(--font-heading);font-size:1.25rem;font-weight:300;color:var(--white);margin-bottom:8px;line-height:1.2;">{{ p.name }}</h3>
+            {% if p.short_description %}
+            <p style="font-size:0.8rem;color:var(--gray-400);line-height:1.7;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+              {{ p.short_description }}
+            </p>
+            {% endif %}
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-family:var(--font-heading);font-size:1.1rem;color:var(--cream);">₹{{ p.price }}</span>
+              <a href="/product/{{ p.slug }}/" class="btn btn-ghost btn-sm" onclick="event.stopPropagation()">Discover</a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+      {% endwith %}
+
+      <!-- If no perfumes in current filter, show featured women perfumes -->
+      {% if not products or not products|length %}
+      <div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
+        <p style="color:var(--gray-400);margin-bottom:20px;">Browse our exclusive women's fragrance collection.</p>
+        <a href="/shop/women/?category=perfumes" class="btn btn-gold">Shop Perfumes</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- If viewing a non-perfume filter and no perfumes shown, add a mini teaser -->
+    {% if active_category and active_category.slug != 'perfumes' %}
+    <div style="
+      margin-top: 48px;
+      padding: 32px;
+      border: 1px solid var(--black-border);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 24px;
+    ">
+      <div>
+        <div style="font-size:0.55rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Also Explore</div>
+        <h3 style="font-family:var(--font-heading);font-size:1.4rem;font-weight:300;margin-bottom:8px;">Women's Fragrances</h3>
+        <p style="font-size:0.85rem;color:var(--gray-400);line-height:1.7;max-width:500px;">
+          Complete your look with VORN's exclusive women's perfume collection — from delicate florals to bold oud.
+        </p>
+      </div>
+      <a href="/shop/women/?category=perfumes" class="btn btn-outline" style="flex-shrink:0;">Shop Perfumes →</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ── New Arrivals Strip ─────────────────────────────────────────── -->
+{% if new_arrivals %}
+<div class="section" style="border-top:1px solid var(--black-border);">
+  <div class="section-header" style="text-align:left;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;">
+    <div>
+      <span class="section-eyebrow">Just In</span>
+      <h2 class="section-title">New Arrivals</h2>
+    </div>
+    <a href="/new-arrivals/?gender=W" class="btn btn-outline">See All →</a>
+  </div>
+  <div class="product-grid">
+    {% for p in new_arrivals %}
+    {% include 'store/_product_card.html' with product=p %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- ── Responsive styles ──────────────────────────────────────────── -->
+<style>
+@media (max-width: 900px) {
+  .gender-catalog-grid > div[style*="grid-template-columns:1fr 1fr"],
+  .section > div > div[style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+}
+@media (max-width: 600px) {
+  #women-perfume-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .gender-filter-strip {
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+  }
+}
+</style>
+
+{% endblock %}

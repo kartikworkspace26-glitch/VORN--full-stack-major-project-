@@ -24,6 +24,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+  <link rel="shortcut icon" href="{% static 'images/logo.png' %}">
+
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
@@ -218,28 +222,30 @@
       <div>
         <div class="mega-menu-section-title">Men</div>
         <div class="mega-menu-links">
-          <a class="mega-menu-link" href="/shop/?gender=M">All Men</a>
-          <a class="mega-menu-link" href="/shop/?gender=M&category=shirts">Shirts</a>
-          <a class="mega-menu-link" href="/shop/?gender=M&category=trousers">Trousers</a>
-          <a class="mega-menu-link" href="/shop/?gender=M&category=outerwear">Outerwear</a>
-          <a class="mega-menu-link" href="/shop/?gender=M&category=knitwear">Knitwear</a>
-          <a class="mega-menu-link" href="/shop/?gender=M&category=suits">Suits</a>
+          <a class="mega-menu-link" href="/shop/men/">All Men</a>
+          <a class="mega-menu-link" href="/shop/men/?category=shirts">Shirts</a>
+          <a class="mega-menu-link" href="/shop/men/?category=trousers">Trousers</a>
+          <a class="mega-menu-link" href="/shop/men/?category=outerwear">Outerwear</a>
+          <a class="mega-menu-link" href="/shop/men/?category=knitwear">Knitwear</a>
+          <a class="mega-menu-link" href="/shop/men/?category=suits">Suits</a>
         </div>
       </div>
       <div>
         <div class="mega-menu-section-title">Women</div>
         <div class="mega-menu-links">
-          <a class="mega-menu-link" href="/shop/?gender=W">All Women</a>
-          <a class="mega-menu-link" href="/shop/?gender=W&category=dresses">Dresses</a>
-          <a class="mega-menu-link" href="/shop/?gender=W&category=tops">Tops</a>
-          <a class="mega-menu-link" href="/shop/?gender=W&category=outerwear">Outerwear</a>
-          <a class="mega-menu-link" href="/shop/?gender=W&category=knitwear">Knitwear</a>
+          <a class="mega-menu-link" href="/shop/women/">All Women</a>
+          <a class="mega-menu-link" href="/shop/women/?category=dresses">Dresses</a>
+          <a class="mega-menu-link" href="/shop/women/?category=tops">Tops</a>
+          <a class="mega-menu-link" href="/shop/women/?category=outerwear">Outerwear</a>
+          <a class="mega-menu-link" href="/shop/women/?category=knitwear">Knitwear</a>
+          <a class="mega-menu-link" href="/shop/women/?category=perfumes">Perfumes</a>
+          <a class="mega-menu-link" href="/shop/women/?category=suits">Suits</a>
         </div>
       </div>
       <div>
         <div class="mega-menu-section-title">Explore</div>
         <div class="mega-menu-links">
-          <a class="mega-menu-link" href="/shop/?is_new=true">New Arrivals</a>
+          <a class="mega-menu-link" href="/new-arrivals/">New Arrivals</a>
           <a class="mega-menu-link" href="/shop/?category=perfumes">Perfumes</a>
           <a class="mega-menu-link" href="/shop/?category=accessories">Accessories</a>
           <a class="mega-menu-link" href="/shop/?category=footwear">Footwear</a>
@@ -267,8 +273,8 @@
      ═══════════════════════════════════════════════════════════════════ -->
 <header class="nav-wrapper" id="navbar" role="banner">
   {% if not hide_announce %}
-  <div class="announcement-bar" id="announce-bar">
-    <div class="marquee-track">
+  <div class="announce-bar" id="announce-bar">
+    <div class="marquee-track" style="color:var(--black);">
       <span>Free shipping on orders over ₹999 &nbsp;·&nbsp; New SS26 Collection Now Live &nbsp;·&nbsp; Authentic Luxury, Crafted in India &nbsp;&nbsp;&nbsp;</span>
       <span aria-hidden="true">Free shipping on orders over ₹999 &nbsp;·&nbsp; New SS26 Collection Now Live &nbsp;·&nbsp; Authentic Luxury, Crafted in India &nbsp;&nbsp;&nbsp;</span>
     </div>
@@ -287,34 +293,35 @@
           tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
         <a href="#" class="nav-link" onclick="event.preventDefault()">Collections <i class="fa fa-chevron-down" style="font-size:0.5rem;margin-left:4px;"></i></a>
       </li>
-      <li><a href="/shop/?is_new=true" class="nav-link">New Arrivals</a></li>
+      <li><a href="/shop/men/" class="nav-link">Men</a></li>
+      <li><a href="/shop/women/" class="nav-link">Women</a></li>
+      <li><a href="/new-arrivals/" class="nav-link">New Arrivals</a></li>
       <li><a href="/lookbook/" class="nav-link">Lookbook</a></li>
-      <li><a href="/shop/?category=accessories" class="nav-link">Accessories</a></li>
     </ul>
 
     <!-- Right: Icons -->
     <div class="navbar-actions">
-      <button id="search-btn" class="nav-action-btn" data-search-trigger aria-label="Search">
+      <button id="search-btn" class="nav-action-btn navbar-action-btn" data-search-trigger aria-label="Search">
         <i class="fa fa-magnifying-glass"></i>
       </button>
 
       {% if user.is_authenticated %}
-      <a href="/accounts/profile/" class="nav-action-btn" aria-label="My Account">
+      <a href="/accounts/profile/" class="nav-action-btn navbar-action-btn" aria-label="My Account">
         <i class="fa fa-circle-user"></i>
       </a>
-      <a href="/accounts/profile/?tab=wishlist" class="nav-action-btn" aria-label="Wishlist" style="position:relative;">
+      <a href="/accounts/profile/?tab=wishlist" class="nav-action-btn navbar-action-btn" aria-label="Wishlist" style="position:relative;">
         <i class="{% if wishlist_count %}fa{% else %}far{% endif %} fa-heart"></i>
         {% if wishlist_count %}
         <span class="cart-badge" style="background:var(--gold);color:var(--black);">{{ wishlist_count }}</span>
         {% endif %}
       </a>
       {% else %}
-      <a href="/accounts/login/" class="nav-action-btn" aria-label="Sign in">
+      <a href="/accounts/login/" class="nav-action-btn navbar-action-btn" aria-label="Sign in">
         <i class="far fa-circle-user"></i>
       </a>
       {% endif %}
 
-      <button class="nav-action-btn" data-cart-drawer-trigger id="cart-btn"
+      <button class="nav-action-btn navbar-action-btn" data-cart-drawer-trigger id="cart-btn"
               aria-label="Shopping cart" style="position:relative;">
         <i class="far fa-shopping-bag"></i>
         <span class="cart-badge{% if not cart_count %} hidden{% endif %}" id="cart-badge-nav">
@@ -323,7 +330,7 @@
       </button>
 
       <!-- Mobile Hamburger -->
-      <button class="nav-action-btn mobile-only" id="mobile-menu-trigger" aria-label="Menu">
+      <button class="nav-action-btn navbar-action-btn mobile-only" id="mobile-menu-trigger" aria-label="Menu">
         <i class="fa fa-bars"></i>
       </button>
     </div>
@@ -342,9 +349,9 @@
     </button>
   </div>
   <div class="mobile-menu-links">
-    <a class="mobile-menu-link" href="/shop/?gender=M">Men's Collection</a>
-    <a class="mobile-menu-link" href="/shop/?gender=W">Women's Collection</a>
-    <a class="mobile-menu-link" href="/shop/?is_new=true">New Arrivals</a>
+    <a class="mobile-menu-link" href="/shop/men/">Men's Collection</a>
+    <a class="mobile-menu-link" href="/shop/women/">Women's Collection</a>
+    <a class="mobile-menu-link" href="/new-arrivals/">New Arrivals</a>
     <a class="mobile-menu-link" href="/shop/?category=perfumes">Perfumes</a>
     <a class="mobile-menu-link" href="/shop/?category=accessories">Accessories</a>
     <a class="mobile-menu-link" href="/lookbook/">Lookbook</a>
@@ -475,7 +482,7 @@
   <!-- Footer Bottom -->
   <div class="footer-bottom">
     <div class="footer-bottom-left">
-      <span>© {{ "now"|date:"Y" }} VORN. All rights reserved.</span>
+      <span>© {% now "Y" %} VORN. All rights reserved.</span>
       <a class="footer-link" href="/legal/#privacy">Privacy Policy</a>
       <a class="footer-link" href="/legal/#terms">Terms of Service</a>
       <a class="footer-link" href="/legal/#cookies">Cookie Policy</a>
@@ -508,7 +515,7 @@
   <div class="ai-stylist-model-selector">
     <label for="ai-stylist-model">Powered by:</label>
     <select id="ai-stylist-model" class="ai-stylist-select" aria-label="AI Model">
-      <option value="gemini-nano-banana-pro" selected>Gemini Nano Banana Pro</option>
+      <option value="vorn-styleai" selected>VORN StyleAI</option>
       <option value="groq">Groq · LLaMA 3.3 70B</option>
     </select>
   </div>

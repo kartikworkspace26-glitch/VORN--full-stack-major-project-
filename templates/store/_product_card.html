@@ -1,46 +1,60 @@
 {% load static %}
-<article class="product-card">
-  <div class="product-card-img">
+<article class="product-card" data-product-id="{{ product.id }}">
+
+  {# ── Image wrap ── #}
+  <div class="product-card-image-wrap">
+    <a href="{% url 'product_detail' product.slug %}" class="product-card-link" aria-label="{{ product.name }}"></a>
+
     {% if product.primary_image %}
     <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}" loading="lazy">
     {% else %}
-    <div class="product-card-img-placeholder">
-      <span>VORN</span>
+    <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--black-elevated),var(--black-card));">
+      <span style="font-family:var(--font-heading);font-size:2.5rem;color:rgba(172,138,83,0.18);letter-spacing:0.3em;">VORN</span>
     </div>
     {% endif %}
 
-    <!-- Badges -->
-    <div class="product-badges">
-      {% if product.is_new_arrival %}<span class="badge badge-new">New</span>{% endif %}
-      {% if product.discount_percentage %}<span class="badge badge-sale">-{{ product.discount_percentage }}%</span>{% endif %}
-      {% if product.is_featured and not product.is_new_arrival %}<span class="badge badge-featured">Featured</span>{% endif %}
+    {# Badges #}
+    <div class="product-card-badges">
+      {% if product.is_new_arrival %}<span class="product-badge badge-new">New</span>{% endif %}
+      {% if product.discount_percentage %}<span class="product-badge badge-sale">−{{ product.discount_percentage }}%</span>{% endif %}
+      {% if product.is_featured and not product.is_new_arrival %}<span class="product-badge" style="background:rgba(172,138,83,0.12);color:var(--gold);border:1px solid rgba(172,138,83,0.3);">Featured</span>{% endif %}
+      {% for tag in product.tags.all %}<span class="product-badge" style="background:rgba(172,138,83,0.08);color:var(--gold);border:1px solid rgba(172,138,83,0.2);">{{ tag.name }}</span>{% endfor %}
     </div>
 
-    <!-- Wishlist -->
-    <a href="{% url 'toggle_wishlist' product.id %}"
-       class="card-wish-btn {% if product.id in request.session.wishlist %}active{% endif %}"
-       title="{% if product.id in request.session.wishlist %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}"
-       aria-label="Wishlist">
-      <i class="{% if product.id in request.session.wishlist %}fas{% else %}far{% endif %} fa-heart"></i>
-    </a>
+    {# Actions: wishlist + quick-add #}
+    <div class="product-card-actions">
+      <button class="product-action-btn"
+              data-wishlist-toggle="{{ product.id }}"
+              aria-label="{% if product.id in request.session.wishlist %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}">
+        <i class="{% if product.id in request.session.wishlist %}fas{% else %}far{% endif %} fa-heart"></i>
+      </button>
+      <button class="product-action-btn"
+              data-quick-add
+              data-name="{{ product.name }}"
+              data-price="₹{{ product.price }}"
+              data-action="/cart/add/{{ product.id }}/"
+              aria-label="Quick add to bag">
+        <i class="fa fa-plus"></i>
+      </button>
+    </div>
 
-    <!-- Quick Shop -->
-    <a href="{% url 'product_detail' product.slug %}" class="card-quick-shop">
-      View Product →
-    </a>
+    {# Quick shop slide-up bar #}
+    <a href="{% url 'product_detail' product.slug %}" class="card-quick-shop">View Product →</a>
   </div>
 
-  <div class="product-card-body">
+  {# ── Info ── #}
+  <div class="product-card-info">
     <div>
-      <div class="product-card-cat">{{ product.category.name }}</div>
+      <div class="product-card-category">{{ product.category.name }}</div>
       <a href="{% url 'product_detail' product.slug %}" class="product-card-name">{{ product.name }}</a>
     </div>
     <div class="product-card-price">
-      <span class="price-now">₹{{ product.price }}</span>
+      <span class="price-current">₹{{ product.price }}</span>
       {% if product.compare_price %}
-      <span class="price-was">₹{{ product.compare_price }}</span>
+      <span class="price-compare">₹{{ product.compare_price }}</span>
       <span class="price-off">{{ product.discount_percentage }}% off</span>
       {% endif %}
     </div>
   </div>
+
 </article>

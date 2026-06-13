@@ -8,7 +8,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'vorn-super-secret-key-change-in-production-2026')
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+
+# ── ALLOWED_HOSTS — includes Render auto-hostname ─────────────────────────────
+_allowed = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h.strip()]
+_render_hostname = os.getenv('RENDER_EXTERNAL_HOSTNAME', '')
+if _render_hostname and _render_hostname not in _allowed:
+    _allowed.append(_render_hostname)
+    # Also allow all subdomains of onrender.com automatically
+    if '.onrender.com' not in _allowed:
+        _allowed.append('.onrender.com')
+ALLOWED_HOSTS = _allowed
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -44,6 +53,8 @@ except ImportError:
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'vorn_project.security.SecurityHeadersMiddleware',
+    'vorn_project.security.RateLimitMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,8 +86,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'vorn_project.wsgi.application'
 
 # ── Database ──────────────────────────────────────────────────────────────────
-USE_POSTGRES = os.getenv('USE_POSTGRES', 'False') == 'True'
-if USE_POSTGRES:
+# Priority: DATABASE_URL env var (Render/Heroku) > explicit PG vars > SQLite
+DATABASE_URL = os.getenv('DATABASE_URL', '')
+
+if DATABASE_URL:
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=60,
+            ssl_require=not DEBUG,
+        )
+    }
+elif os.getenv('USE_POSTGRES', 'False') == 'True':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -143,6 +165,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 # ── Cache ─────────────────────────────────────────────────────────────────────
+# Use LocMemCache (safe default — no createcachetable needed)
 REDIS_URL = os.getenv('REDIS_URL', '')
 if REDIS_URL:
     CACHES = {
@@ -154,8 +177,8 @@ if REDIS_URL:
 else:
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-            'LOCATION': 'vorn_cache_table',
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'vorn-cache',
         }
     }
 
@@ -171,6 +194,8 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'VORN <hello@vorn.in>')
 # ── Session ───────────────────────────────────────────────────────────────────
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_AGE = 86400 * 7  # 7 days
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 # ── Payment Gateways ──────────────────────────────────────────────────────────
 RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID', 'rzp_test_placeholder')
@@ -187,7 +212,6 @@ STRIPE_ENABLED = bool(STRIPE_PUBLISHABLE_KEY)
 PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID', '')
 PAYPAL_ENABLED = bool(PAYPAL_CLIENT_ID)
 
-
 # ── Crispy Forms ──────────────────────────────────────────────────────────────
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
@@ -202,12 +226,23 @@ VORN_TAGLINE = 'Refined Luxury Fashion'
 VORN_SUPPORT_EMAIL = 'hello@vorn.in'
 
 # ── Security (Production) ─────────────────────────────────────────────────────
+# Always set X-Frame-Options and content sniff protection
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_SSL_REDIRECT = True
+    # On Render, SSL is terminated at the proxy level — do NOT redirect internally
+    SECURE_SSL_REDIRECT = False
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+# CSRF Trusted Origins — read from env so Render can inject it
+_csrf_origins_env = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+if _csrf_origins_env:
+    CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins_env.split(',') if o.strip()]
+elif _render_hostname:
+    CSRF_TRUSTED_ORIGINS = [f'https://{_render_hostname}', 'https://*.onrender.com']

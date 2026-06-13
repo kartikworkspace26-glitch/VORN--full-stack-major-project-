@@ -13,11 +13,20 @@ def homepage(request):
     featured = Product.objects.filter(is_featured=True, is_active=True)[:8]
     new_arrivals = Product.objects.filter(is_new_arrival=True, is_active=True)[:8]
     categories = Category.objects.filter(is_active=True)[:6]
+
+    usps = [
+        {'icon': 'fa fa-shield-halved', 'title': '100% Authentic', 'desc': 'Every product certified genuine. No counterfeits, ever.'},
+        {'icon': 'fa fa-truck-fast', 'title': 'Free Shipping', 'desc': 'Complimentary on all orders above ₹999. Pan-India.'},
+        {'icon': 'fa fa-arrows-rotate', 'title': '15-Day Returns', 'desc': 'Hassle-free returns. No questions asked, always.'},
+        {'icon': 'fa fa-lock', 'title': 'Secure Checkout', 'desc': '256-bit SSL encryption. Razorpay & UPI accepted.'},
+    ]
+
     return render(request, 'store/home.html', {
         'featured': featured,
         'featured_products': featured,
         'new_arrivals': new_arrivals,
         'categories': categories,
+        'usps': usps,
     })
 
 
@@ -54,6 +63,10 @@ def catalog(request):
     if is_new:
         products = products.filter(is_new_arrival=True)
 
+    is_featured = request.GET.get('is_featured')
+    if is_featured:
+        products = products.filter(is_featured=True)
+
     sort_options = {
         '-created_at': 'Newest First',
         'price': 'Price: Low to High',
@@ -73,6 +86,54 @@ def catalog(request):
         'gender_filter': gender,
         'max_price': max_price,
         'is_new': is_new,
+        'is_featured': is_featured,
+    })
+
+
+# ── New Arrivals (dedicated editorial page) ───────────────────────────────────
+def new_arrivals(request):
+    """Dedicated New Arrivals landing page with editorial UI."""
+    gender = request.GET.get('gender', '')
+    category_slug = request.GET.get('category', '')
+    sort = request.GET.get('sort', '-created_at')
+
+    products = Product.objects.filter(
+        is_active=True, is_new_arrival=True
+    ).select_related('category').prefetch_related('images')
+
+    if gender and gender in ['M', 'W']:
+        products = products.filter(Q(gender=gender) | Q(gender='U'))
+    elif gender == 'U':
+        products = products.filter(gender='U')
+
+    active_category = None
+    if category_slug:
+        try:
+            active_category = Category.objects.get(slug=category_slug)
+            products = products.filter(category=active_category)
+        except Category.DoesNotExist:
+            pass
+
+    sort_options = {
+        '-created_at': 'Newest First',
+        'price': 'Price: Low to High',
+        '-price': 'Price: High to Low',
+        'name': 'Name A–Z',
+    }
+    if sort in sort_options:
+        products = products.order_by(sort)
+
+    categories = Category.objects.filter(is_active=True)
+    total_count = Product.objects.filter(is_active=True, is_new_arrival=True).count()
+
+    return render(request, 'store/new_arrivals.html', {
+        'products': products,
+        'categories': categories,
+        'active_category': active_category,
+        'sort_options': sort_options,
+        'current_sort': sort,
+        'gender_filter': gender,
+        'total_new_count': total_count,
     })
 
 
@@ -184,7 +245,11 @@ def remove_from_cart(request, key):
         del cart[key]
         request.session['cart'] = cart
         request.session.modified = True
-        messages.success(request, 'Item removed from bag.')
+    # Return JSON for AJAX calls, redirect for regular form POST
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        count = sum(i.get('quantity', 0) for i in cart.values())
+        return JsonResponse({'success': True, 'cart_count': count})
+    messages.success(request, 'Item removed from bag.')
     return redirect('cart')
 
 
@@ -198,6 +263,11 @@ def update_cart(request, key):
             del cart[key]
         request.session['cart'] = cart
         request.session.modified = True
+    # Return JSON for AJAX calls, redirect for regular form POST
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        count = sum(i.get('quantity', 0) for i in cart.values())
+        total = sum(i['price'] * i['quantity'] for i in cart.values())
+        return JsonResponse({'success': True, 'cart_count': count, 'total': float(total)})
     return redirect('cart')
 
 
@@ -237,6 +307,9 @@ def wishlist(request):
 
 def toggle_wishlist(request, product_id):
     wishlist = request.session.get('wishlist', [])
+    # Ensure all stored IDs are ints (session may deserialise as strings)
+    wishlist = [int(x) for x in wishlist]
+    product_id = int(product_id)
     if product_id in wishlist:
         wishlist.remove(product_id)
         added = False
@@ -267,7 +340,7 @@ def submit_review(request, product_id):
     return redirect('product_detail', slug=product.slug)
 
 
-# ── Lookbook & Size Guide ─────────────────────────────────────────────────────
+# ── Lookbook & Size Guide ────────────────────────────────────────────
 def lookbook(request):
     return render(request, 'store/lookbook.html')
 
@@ -284,7 +357,88 @@ def legal_view(request):
     return render(request, 'store/legal.html')
 
 
-@csrf_exempt
+# ── Dedicated Gender Catalog Pages ───────────────────────────────────
+def men_catalog(request):
+    """Dedicated Men's Collection landing page."""
+    products = Product.objects.filter(
+        is_active=True
+    ).filter(
+        Q(gender='M') | Q(gender='U')
+    ).select_related('category').prefetch_related('images')
+
+    # Apply sub-filters from query params
+    category_slug = request.GET.get('category')
+    sort = request.GET.get('sort', '-created_at')
+    active_category = None
+    if category_slug:
+        active_category = get_object_or_404(Category, slug=category_slug)
+        products = products.filter(category=active_category)
+
+    sort_options = {
+        '-created_at': 'Newest First',
+        'price': 'Price: Low to High',
+        '-price': 'Price: High to Low',
+    }
+    if sort in sort_options:
+        products = products.order_by(sort)
+
+    categories = Category.objects.filter(is_active=True)
+    featured = products.filter(is_featured=True)[:4]
+    new_arrivals = products.filter(is_new_arrival=True)[:8]
+
+    return render(request, 'store/men.html', {
+        'products': products,
+        'categories': categories,
+        'active_category': active_category,
+        'sort_options': sort_options,
+        'current_sort': sort,
+        'featured': featured,
+        'new_arrivals': new_arrivals,
+        'gender_filter': 'M',
+    })
+
+
+def women_catalog(request):
+    """Dedicated Women's Collection landing page."""
+    products = Product.objects.filter(
+        is_active=True
+    ).filter(
+        Q(gender='W') | Q(gender='U')
+    ).select_related('category').prefetch_related('images')
+
+    # Apply sub-filters from query params
+    category_slug = request.GET.get('category')
+    sort = request.GET.get('sort', '-created_at')
+    active_category = None
+    if category_slug:
+        active_category = get_object_or_404(Category, slug=category_slug)
+        products = products.filter(category=active_category)
+
+    sort_options = {
+        '-created_at': 'Newest First',
+        'price': 'Price: Low to High',
+        '-price': 'Price: High to Low',
+    }
+    if sort in sort_options:
+        products = products.order_by(sort)
+
+    categories = Category.objects.filter(is_active=True)
+    featured = products.filter(is_featured=True)[:4]
+    new_arrivals = products.filter(is_new_arrival=True)[:8]
+
+    return render(request, 'store/women.html', {
+        'products': products,
+        'categories': categories,
+        'active_category': active_category,
+        'sort_options': sort_options,
+        'current_sort': sort,
+        'featured': featured,
+        'new_arrivals': new_arrivals,
+        'gender_filter': 'W',
+    })
+
+
+@csrf_exempt  # This is an internal AJAX endpoint protected by JSON body validation
 def ai_stylist(request):
     """
     VORN AI Personal Stylist — powered by Groq (llama-3.3-70b-versatile).
