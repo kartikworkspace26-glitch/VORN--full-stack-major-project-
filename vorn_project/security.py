@@ -27,15 +27,16 @@ class SecurityHeadersMiddleware:
         # and the Groq API (backend only — no direct browser calls).
         csp = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://cdnjs.cloudflare.com https://ka-f.fontawesome.com; "
+            "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://cdnjs.cloudflare.com https://ka-f.fontawesome.com https://kit.fontawesome.com; "
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://ka-f.fontawesome.com; "
             "font-src 'self' https://fonts.gstatic.com https://ka-f.fontawesome.com data:; "
             "img-src 'self' data: https: blob:; "
-            "connect-src 'self' https://checkout.razorpay.com; "
-            "frame-src https://checkout.razorpay.com; "
+            "media-src 'self' https: blob:; "
+            "connect-src 'self' https://checkout.razorpay.com https://liveapi.razorpay.com https://api.razorpay.com https://api.groq.com; "
+            "frame-src https://checkout.razorpay.com https://api.razorpay.com; "
             "object-src 'none'; "
             "base-uri 'self'; "
-            "form-action 'self' https://api.razorpay.com;"
+            "form-action 'self' https://api.razorpay.com https://checkout.razorpay.com;"
         )
         response["Content-Security-Policy"] = csp
 

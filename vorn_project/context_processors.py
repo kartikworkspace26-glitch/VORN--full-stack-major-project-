@@ -23,11 +23,16 @@ def vorn_globals(request):
         wishlist_count = len(request.session.get('wishlist', []))
 
     return {
-        'nav_categories': nav_categories,
-        'wishlist_count': wishlist_count,
-        'VORN_CURRENCY_SYMBOL': getattr(settings, 'VORN_CURRENCY_SYMBOL', '₹'),
+        'nav_categories':               nav_categories,
+        'wishlist_count':               wishlist_count,
+        'VORN_CURRENCY_SYMBOL':         getattr(settings, 'VORN_CURRENCY_SYMBOL', '₹'),
         'VORN_FREE_SHIPPING_THRESHOLD': getattr(settings, 'VORN_FREE_SHIPPING_THRESHOLD', 999),
-        'VORN_SITE_NAME': getattr(settings, 'VORN_SITE_NAME', 'VORN'),
-        'VORN_TAGLINE': getattr(settings, 'VORN_TAGLINE', 'Refined Luxury Fashion'),
-        'VORN_SUPPORT_EMAIL': getattr(settings, 'VORN_SUPPORT_EMAIL', 'hello@vorn.in'),
+        'VORN_SITE_NAME':               getattr(settings, 'VORN_SITE_NAME', 'VORN'),
+        'VORN_TAGLINE':                 getattr(settings, 'VORN_TAGLINE', 'Refined Luxury Fashion'),
+        'VORN_SUPPORT_EMAIL':           getattr(settings, 'VORN_SUPPORT_EMAIL', 'hello@vorn.in'),
+        # Payment globals — available in ALL templates (especially checkout)
+        'razorpay_key_id':              getattr(settings, 'RAZORPAY_KEY_ID', ''),
+        'razorpay_me_link':             getattr(settings, 'RAZORPAY_ME_LINK', ''),
+        'stripe_publishable_key':       getattr(settings, 'STRIPE_PUBLISHABLE_KEY', ''),
     }
+
