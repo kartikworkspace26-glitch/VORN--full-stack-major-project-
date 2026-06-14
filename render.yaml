@@ -32,9 +32,9 @@ services:
       - key: EMAIL_BACKEND
         value: "django.core.mail.backends.console.EmailBackend"
       - key: RAZORPAY_KEY_ID
-        sync: false
+        value: "rzp_test_Su69JbzqTp4aKh"
       - key: RAZORPAY_KEY_SECRET
-        sync: false
+        value: "m4mb5wB0mb30Pk5R8I3JbGzr"
       - key: RAZORPAY_ME_LINK
         value: "https://razorpay.me/@vorn"
       - key: GROQ_API_KEY
@@ -45,3 +45,4 @@ services:
         sync: false
       - key: DJANGO_SUPERUSER_USERNAME
         value: "admin"
+

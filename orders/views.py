@@ -142,44 +142,39 @@ def create_razorpay_order(request):
     if err:
         return JsonResponse({'error': err}, status=400)
 
-    # Try Razorpay SDK if keys are real
-    key_id = settings.RAZORPAY_KEY_ID
+    key_id     = settings.RAZORPAY_KEY_ID
     key_secret = settings.RAZORPAY_KEY_SECRET
     amount_paise = max(order.total_in_paise, 100)
 
-    if key_id and key_id != 'rzp_test_placeholder' and key_secret != 'placeholder_secret':
-        try:
-            import razorpay
-            client = razorpay.Client(auth=(key_id, key_secret))
-            rz_order = client.order.create({
-                'amount': amount_paise,
-                'currency': 'INR',
-                'receipt': order.order_number,
-                'notes': {'order_id': str(order.id)},
-            })
-            order.razorpay_order_id = rz_order['id']
-            order.save()
+    try:
+        import razorpay
+        client   = razorpay.Client(auth=(key_id, key_secret))
+        rz_order = client.order.create({
+            'amount':   amount_paise,
+            'currency': 'INR',
+            'receipt':  order.order_number,
+            'notes':    {'order_id': str(order.id)},
+        })
+        order.razorpay_order_id = rz_order['id']
+        order.save()
 
-            return JsonResponse({
-                'razorpay_order_id': rz_order['id'],
-                'amount': amount_paise,
-                'currency': 'INR',
-                'order_db_id': order.id,
-            })
-        except Exception as e:
-            # Fall through to payment link flow
-            pass
+        return JsonResponse({
+            'razorpay_order_id': rz_order['id'],
+            'amount':            amount_paise,
+            'currency':          'INR',
+            'order_db_id':       order.id,
+            'order_number':      order.order_number,
+        })
 
-    # Return order details for Razorpay.me link flow
-    return JsonResponse({
-        'order_db_id': order.id,
-        'order_number': order.order_number,
-        'amount': amount_paise,
-        'amount_rupees': float(order.total),
-        'currency': 'INR',
-        'razorpay_me_link': settings.RAZORPAY_ME_LINK,
-        'use_payment_link': True,
-    })
+    except Exception as e:
+        import logging
+        logging.getLogger('vorn').error(f'[Razorpay] Order creation failed: {e}')
+        # Delete the orphaned DB order so the cart stays intact
+        order.delete()
+        return JsonResponse(
+            {'error': 'Payment gateway error. Please try again in a moment.'},
+            status=502,
+        )
 
 
 # ── Initiate Payment Link ─────────────────────────────────────────────────────
@@ -307,12 +302,26 @@ def payment_callback(request):
     razorpay_order_id   = data.get('razorpay_order_id', '')
     razorpay_signature  = data.get('razorpay_signature', '')
 
-    # Verify signature
+    # Verify HMAC signature — required, no bypass
     key_secret = settings.RAZORPAY_KEY_SECRET.encode('utf-8')
-    message = f"{razorpay_order_id}|{razorpay_payment_id}".encode('utf-8')
-    generated = hmac.new(key_secret, message, hashlib.sha256).hexdigest()
+    message    = f"{razorpay_order_id}|{razorpay_payment_id}".encode('utf-8')
+    generated  = hmac.new(key_secret, message, hashlib.sha256).hexdigest()
+    # Also try the Razorpay SDK verify util if available
+    try:
+        import razorpay as rzp_sdk
+        rzp_client = rzp_sdk.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        params = {
+            'razorpay_order_id': razorpay_order_id,
+            'razorpay_payment_id': razorpay_payment_id,
+            'razorpay_signature': razorpay_signature,
+        }
+        rzp_client.utility.verify_payment_signature(params)
+        signature_valid = True
+    except Exception:
+        # Fall back to our own HMAC check
+        signature_valid = (generated == razorpay_signature)
 
-    if generated == razorpay_signature or settings.RAZORPAY_KEY_SECRET == 'placeholder_secret':
+    if signature_valid:
         order.razorpay_payment_id = razorpay_payment_id
         order.razorpay_order_id   = razorpay_order_id
         order.razorpay_signature  = razorpay_signature

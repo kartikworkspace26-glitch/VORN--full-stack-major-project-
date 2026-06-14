@@ -6,10 +6,13 @@
     <a href="{% url 'product_detail' product.slug %}" class="product-card-link" aria-label="{{ product.name }}"></a>
 
     {% if product.primary_image %}
-    <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}" loading="lazy">
+    <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}" loading="lazy"
+         onload="this.classList.add('loaded')"
+         onerror="this.parentNode.classList.add('img-error');this.style.display='none'">
     {% else %}
-    <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--black-elevated),var(--black-card));">
-      <span style="font-family:var(--font-heading);font-size:2.5rem;color:rgba(172,138,83,0.18);letter-spacing:0.3em;">VORN</span>
+    <div class="vorn-placeholder">
+      <span class="vorn-placeholder-text">VORN</span>
+      <div class="vorn-placeholder-line"></div>
     </div>
     {% endif %}
 
@@ -17,8 +20,8 @@
     <div class="product-card-badges">
       {% if product.is_new_arrival %}<span class="product-badge badge-new">New</span>{% endif %}
       {% if product.discount_percentage %}<span class="product-badge badge-sale">−{{ product.discount_percentage }}%</span>{% endif %}
-      {% if product.is_featured and not product.is_new_arrival %}<span class="product-badge" style="background:rgba(172,138,83,0.12);color:var(--gold);border:1px solid rgba(172,138,83,0.3);">Featured</span>{% endif %}
-      {% for tag in product.tags.all %}<span class="product-badge" style="background:rgba(172,138,83,0.08);color:var(--gold);border:1px solid rgba(172,138,83,0.2);">{{ tag.name }}</span>{% endfor %}
+      {% if product.is_featured and not product.is_new_arrival %}<span class="product-badge" style="background:rgba(139,105,20,0.12);color:var(--dark-gold);border:1px solid rgba(139,105,20,0.3);">Featured</span>{% endif %}
+      {% for tag in product.tags.all %}<span class="product-badge" style="background:rgba(139,105,20,0.08);color:var(--dark-gold);border:1px solid rgba(139,105,20,0.2);">{{ tag.name }}</span>{% endfor %}
     </div>
 
     {# Actions: wishlist + quick-add #}
@@ -58,3 +61,4 @@
   </div>
 
 </article>
+

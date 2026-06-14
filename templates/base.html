@@ -259,7 +259,7 @@
     <div>
       <div class="mega-menu-section-title">New Season</div>
       <div style="position:relative;overflow:hidden;aspect-ratio:3/4;background:var(--black-elevated);">
-        <img src="{% static 'images/category_outerwear.jpg' %}" alt="New Arrivals"
+        <img src="{% static 'images/womens_outerwear_coat.jpg' %}" alt="New Arrivals"
              style="width:100%;height:100%;object-fit:cover;" loading="lazy">
       </div>
       <div class="mega-menu-featured-label">New Arrivals</div>
@@ -498,6 +498,42 @@
 </footer>
 
 <!-- ═══════════════════════════════════════════════════════════════════
+     MOBILE BOTTOM NAV BAR
+     ═══════════════════════════════════════════════════════════════════ -->
+<nav class="mobile-bottom-nav" aria-label="Mobile bottom navigation" role="navigation">
+  <a href="/" class="mobile-bottom-nav-item {% block nav_home %}{% endblock %}" aria-label="Home">
+    <i class="fa fa-house"></i>
+    <span>Home</span>
+  </a>
+  <a href="/shop/" class="mobile-bottom-nav-item {% block nav_shop %}{% endblock %}" aria-label="Shop">
+    <i class="fa fa-grid-2"></i>
+    <span>Shop</span>
+  </a>
+  <a href="/shop/search/" class="mobile-bottom-nav-item" aria-label="Search" id="mobile-search-btn">
+    <i class="fa fa-magnifying-glass"></i>
+    <span>Search</span>
+  </a>
+  <button class="mobile-bottom-nav-item" data-cart-drawer-trigger aria-label="Cart" style="background:none;border:none;cursor:pointer;font-family:inherit;">
+    <div style="position:relative;display:inline-block;">
+      <i class="far fa-shopping-bag"></i>
+      <span class="mobile-cart-badge{% if not cart_count %}" style="display:none;{% endif %}">{{ cart_count|default:0 }}</span>
+    </div>
+    <span>Bag</span>
+  </button>
+  {% if user.is_authenticated %}
+  <a href="/accounts/profile/" class="mobile-bottom-nav-item" aria-label="Account">
+    <i class="fa fa-circle-user"></i>
+    <span>Account</span>
+  </a>
+  {% else %}
+  <a href="/accounts/login/" class="mobile-bottom-nav-item" aria-label="Sign In">
+    <i class="far fa-circle-user"></i>
+    <span>Sign In</span>
+  </a>
+  {% endif %}
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════════════
      VORN AI STYLIST CHATBOT WIDGET
      ═══════════════════════════════════════════════════════════════════ -->
 <button id="ai-stylist-toggle" class="ai-stylist-toggle-btn" aria-label="Toggle AI Stylist" title="Ask VORN AI Stylist">
@@ -625,5 +661,56 @@
 </script>
 
 {% block extra_js %}{% endblock %}
+
+<script>
+/* ── Mobile bottom nav: search btn opens overlay ──────────────── */
+(function () {
+  const mobileSearchBtn = document.getElementById('mobile-search-btn');
+  const searchOverlay   = document.getElementById('search-overlay');
+  const searchInput     = document.getElementById('search-overlay-input');
+  if (mobileSearchBtn && searchOverlay) {
+    mobileSearchBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      searchOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => searchInput?.focus(), 100);
+    });
+  }
+
+  /* ── Lazy image load — add 'loaded' class after paint ─────── */
+  if ('IntersectionObserver' in window) {
+    const imgObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          if (img.complete && img.naturalWidth > 0) {
+            img.classList.add('loaded');
+          } else {
+            img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
+          }
+          imgObserver.unobserve(img);
+        }
+      });
+    }, { rootMargin: '200px' });
+
+    document.querySelectorAll('.product-card-image-wrap img[loading="lazy"]').forEach(img => {
+      imgObserver.observe(img);
+    });
+  } else {
+    /* Fallback: just add loaded to all lazy images */
+    document.querySelectorAll('.product-card-image-wrap img').forEach(img => {
+      img.classList.add('loaded');
+    });
+  }
+
+  /* ── Active mobile nav item highlight ─────────────────────── */
+  const path = window.location.pathname;
+  document.querySelectorAll('.mobile-bottom-nav-item').forEach(item => {
+    const href = item.getAttribute('href');
+    if (href && path === href) item.classList.add('active');
+    if (href && href !== '/' && path.startsWith(href)) item.classList.add('active');
+  });
+})();
+</script>
 </body>
 </html>

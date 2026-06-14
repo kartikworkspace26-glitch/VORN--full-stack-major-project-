@@ -35,13 +35,13 @@ except ImportError:
 
 # Category assets mapping (copied if exist)
 category_images_mapping = {
-    'cat-shirts.png': os.path.join(BASE_DIR, 'static', 'images', 'cat-shirts.png'),
-    'cat-trousers.png': os.path.join(BASE_DIR, 'static', 'images', 'cat-trousers.png'),
-    'cat-outerwear.png': os.path.join(BASE_DIR, 'static', 'images', 'cat-outerwear.png'),
-    'cat-knitwear.png': os.path.join(BASE_DIR, 'static', 'images', 'cat-knitwear.png'),
-    'cat-accessories.png': os.path.join(BASE_DIR, 'static', 'images', 'cat-accessories.png'),
-    'cat-footwear.png': os.path.join(BASE_DIR, 'static', 'images', 'cat-footwear.png'),
-    'cat-perfumes.png': os.path.join(BASE_DIR, 'static', 'images', 'cat-perfumes.png'),
+    'cat-shirts.png': os.path.join(BASE_DIR, 'static', 'images', 'mens_shirt_linen_editorial.jpg'),
+    'cat-trousers.png': os.path.join(BASE_DIR, 'static', 'images', 'womens_silk_dress_editorial.jpg'),
+    'cat-outerwear.png': os.path.join(BASE_DIR, 'static', 'images', 'mens_outerwear_camel.jpg'),
+    'cat-knitwear.png': os.path.join(BASE_DIR, 'static', 'images', 'mens_knitwear_navy.jpg'),
+    'cat-accessories.png': os.path.join(BASE_DIR, 'static', 'images', 'mens_accessories_leather.jpg'),
+    'cat-footwear.png': os.path.join(BASE_DIR, 'static', 'images', 'womens_outerwear_coat.jpg'),
+    'cat-perfumes.png': os.path.join(BASE_DIR, 'static', 'images', 'womens_silk_blouse_editorial.jpg'),
 }
 
 def copy_category_assets():
@@ -107,38 +107,38 @@ def seed_database():
              description="A deep, hypnotic scent layered with rich Haitian vetiver, smoked cedarwood, and aged patchouli. It opens with sharp black pepper and frankincense, settling into a warm amber and dry leather base.",
              short_description="A deep, smoky blend of Haitian vetiver and aged patchouli.",
              price=4800, compare_price=5800, gender='U', material='Eau de Parfum', is_featured=True,
-             base_filename='perfume_vetiver_ancestral_1779869504405.png'),
+             base_filename=None),
 
         dict(name="VORN Imperial Sandalwood", slug="vorn-imperial-sandalwood", category=categories['perfumes'],
              description="Woven from pure Mysore sandalwood, saffron, and crushed cardamom. A creamy, majestic fragrance with a skin-like texture that lingers throughout the day.",
              short_description="Creamy Mysore sandalwood layered with warm saffron.",
              price=4600, compare_price=None, gender='U', material='Eau de Parfum Extract', is_featured=True,
-             base_filename='perfume_imperial_sandalwood_1779869633951.png'),
+             base_filename=None),
 
         dict(name="VORN Bergamote Noble", slug="vorn-bergamote-noble", category=categories['perfumes'],
              description="A bright, noble opening of cold-pressed Calabrian bergamot and Tunisian neroli, resting on a base of white ambergris and soft musk. Clean, commanding, and timeless.",
              short_description="Crisp Calabrian bergamot and Tunisian neroli.",
              price=4200, compare_price=None, gender='U', material='Eau de Parfum', is_featured=False,
-             base_filename='perfume_bergamote_noble_1779869984600.png'),
+             base_filename=None),
 
         # === WOMEN'S COLLECTION ===
         dict(name="Monarch Silk Draped Blouse", slug="monarch-silk-draped-blouse", category=categories['tops'],
              description="Cut from 22momme mulberry silk, this blouse features an architectural cowl drape, dropped shoulders, and double-button cuffs. A statement of fluid, quiet luxury.",
              short_description="Heavy mulberry silk blouse with an architectural drape.",
              price=5200, compare_price=6800, gender='W', material='100% Mulberry Silk', is_featured=True,
-             base_filename='women_silk_blouse_1779870005478.png'),
+             base_filename='womens_silk_blouse_editorial.jpg'),
 
         dict(name="Elysian Wide-Leg Silk Pant", slug="elysian-wide-leg-silk-pant", category=categories['trousers'],
              description="Flowing wide-leg trousers designed with an ultra-high waist, clean front zip closure, and deep side pockets. Cut from heavyweight fluid sand silk crepe de chine.",
              short_description="Heavyweight fluid silk crepe wide-leg trousers.",
              price=6800, compare_price=8900, gender='W', material='100% Silk Crepe de Chine', is_featured=True,
-             base_filename='women_silk_pant_1779870035510.png'),
+             base_filename=None),
 
         dict(name="Cashmere Belted Wrap Coat", slug="cashmere-belted-wrap-coat", category=categories['outerwear'],
              description="A luxurious open-front wrap coat hand-stitched from double-faced cashmere and virgin wool. Styled with a shawl collar and loose self-tie belt in soft alabaster bone.",
              short_description="Double-faced cashmere-blend wrap coat in alabaster.",
              price=14800, compare_price=18900, gender='W', material='70% Merino Wool, 30% Cashmere', is_featured=True,
-             base_filename=None),
+             base_filename='womens_cashmere_knitwear.jpg'),
 
         dict(name="Asymmetric Silk Satin Slip Dress", slug="asymmetric-silk-satin-slip-dress", category=categories['dresses'],
              description="Bias-cut dress in high-lustre silk satin. Features an asymmetric one-shoulder strap, draped cowl neck, and a delicate side slit in deep obsidian.",
@@ -151,13 +151,13 @@ def seed_database():
              description="A timeless three-piece suit tailored from structured chalkstripe English wool. Features a sharp peak lapel blazer, matching vest, and classic double-pleated trousers.",
              short_description="Navy chalkstripe English wool double-breasted suit.",
              price=16800, compare_price=22000, gender='M', material='100% English Wool', is_featured=True,
-             base_filename=None),
+             base_filename='mens_suit_editorial.jpg'),
 
         dict(name="Heritage Tweed Overcoat", slug="heritage-tweed-overcoat", category=categories['outerwear'],
              description="Classic long double-breasted overcoat tailored from heavy salt-and-pepper Scottish tweed. Features structured shoulders, real horn buttons, and deep welt pockets.",
              short_description="Heavy salt-and-pepper Scottish tweed overcoat.",
              price=13800, compare_price=17500, gender='M', material='100% Scottish Tweed, Cupro Lining', is_featured=True,
-             base_filename=None),
+             base_filename='mens_outerwear_camel.jpg'),
 
         dict(name="Merino Shawl-Collar Cardigan", slug="merino-shawl-collar-cardigan", category=categories['knitwear'],
              description="A heavy-gauge cardigan cable-knit from 100% merino wool. Styled with a thick shawl collar, leather-wrapped buttons, and patch pockets in heather oatmeal.",
@@ -182,7 +182,7 @@ def seed_database():
              description="Handcrafted in Italy from ultra-soft taupe suede, featuring a comfortable block heel and clean pointed-toe silhouette. A perfect choice for effortless day-to-night styling.",
              short_description="Premium Italian suede ankle boots with a refined block heel.",
              price=7999, compare_price=9999, gender='W', material='100% Suede Leather, Leather Sole', is_featured=True,
-             base_filename=None),
+             base_filename='womens_outerwear_coat.jpg'),
 
         # === MENSWEAR / UNISEX FOUNDATIONS ===
         dict(name="Obsidian Oxford Shirt", slug="obsidian-oxford-shirt", category=categories['shirts'],
@@ -195,7 +195,7 @@ def seed_database():
              description="Woven from Portuguese linen, this shirt breathes beautifully in any climate. The slightly relaxed fit allows for effortless layering. The ivory tone works as a canvas for your accessories.",
              short_description="Portuguese linen shirt in off-white — breathes beautifully.",
              price=1999, compare_price=None, gender='U', material='100% Portuguese Linen', is_featured=False,
-             base_filename=None),
+             base_filename='mens_shirt_linen_editorial.jpg'),
 
         dict(name="Charcoal Slim Trouser", slug="charcoal-slim-trouser", category=categories['trousers'],
              description="Tailored in a premium Italian mill from a refined wool-blend fabric. A slim leg that breaks at the ankle for the modern silhouette. The side-adjusters replace the belt entirely.",
@@ -207,19 +207,19 @@ def seed_database():
              description="The iconic camel overcoat, cut in a double-faced cashmere-wool blend. The silhouette is elongating and authoritative. Horn buttons, double-vent, and a structured shoulder that requires no tailoring.",
              short_description="Double-faced cashmere-blend overcoat in camel. Timeless, authoritative.",
              price=12999, compare_price=16999, gender='U', material='60% Cashmere, 40% Merino Wool — Italian double-face', is_featured=False,
-             base_filename=None),
+             base_filename='mens_outerwear_camel.jpg'),
 
         dict(name="Midnight Merino Crewneck", slug="midnight-merino-crewneck", category=categories['knitwear'],
              description="Extra-fine 18-gauge merino wool knit in deep midnight navy. The weight is perfect for layering without bulk. The ribbed hem and cuffs stay true to shape through repeated wear.",
              short_description="Extra-fine 18-gauge merino crewneck — layers without bulk.",
              price=4499, compare_price=5999, gender='U', material='100% Extra-Fine Merino Wool, 18 Gauge', is_featured=False,
-             base_filename=None),
+             base_filename='mens_knitwear_navy.jpg'),
 
         dict(name="Leather Card Wallet", slug="leather-card-wallet", category=categories['accessories'],
              description="Slim bifold wallet in full-grain vegetable-tanned leather sourced from a 150-year-old Italian tannery. Holds 6 cards and notes. The leather develops a rich patina with age — a companion for life.",
              short_description="Full-grain Italian vegetable-tanned leather — gets better with age.",
              price=1499, compare_price=None, gender='U', material='Full-grain Vegetable-Tanned Leather, Italian origin', is_featured=False,
-             base_filename=None),
+             base_filename='mens_accessories_leather.jpg'),
 
         dict(name="Silk Pocket Square", slug="silk-pocket-square", category=categories['accessories'],
              description="Hand-rolled edges, printed in Como, Italy. 100% pure silk, 33x33cm. Each fold tells a different story. The final gesture of a considered outfit — effortless, yet deliberate.",
@@ -293,7 +293,7 @@ def seed_database():
              description="Classic bias-cut slip dress in fluid 22momme mulberry silk. Designed with spaghetti straps, a soft cowl neck, and a delicate side slit. It slides down the body like liquid gold.",
              short_description="Bias-cut pure mulberry silk slip dress with cowl neckline.",
              price=9200, compare_price=12000, gender='W', material='100% Mulberry Silk', is_featured=True,
-             base_filename=None),
+             base_filename='womens_silk_dress_editorial.jpg'),
 
         dict(name="Linen Tiered Maxi Dress", slug="linen-tiered-maxi-dress", category=categories['dresses'],
              description="A beautiful, tiered maxi dress in breezy, lightweight washed linen. Styled with a gathered neckline and raw-edged tiers that drape gracefully down to the floor.",
@@ -305,7 +305,7 @@ def seed_database():
              description="An exquisite floor-length evening gown cut from high-lustre emerald green silk satin. Features a draped, asymmetric one-shoulder design and a high dramatic leg slit.",
              short_description="Exquisite one-shoulder high-lustre emerald satin gown.",
              price=11500, compare_price=15000, gender='W', material='100% Silk Satin', is_featured=True,
-             base_filename=None),
+             base_filename='womens_evening_gown.jpg'),
     ]
 
     for idx, p in enumerate(products_data):
@@ -316,125 +316,32 @@ def seed_database():
         unique_img_name = f"product_{slug}.png"
         dest_path = os.path.join(PRODUCTS_MEDIA_DIR, unique_img_name)
         
-        # 1. Determine image source from static/images/products first, then artifacts
+        # 1. Determine image source
         src_path = None
         if base_filename:
-            # Check the tracked static images folder (guaranteed to be on GitHub/Render)
-            static_cand = os.path.join(STATIC_PRODUCTS_DIR, base_filename)
+            static_cand = os.path.join(BASE_DIR, 'static', 'images', base_filename)
             if os.path.exists(static_cand):
                 src_path = static_cand
-            else:
-                # Fallback to local developer artifact directories
-                for d in ARTIFACT_DIRS:
-                    p_path = os.path.join(d, base_filename)
-                    if os.path.exists(p_path):
-                        src_path = p_path
-                        break
         
-        # 2. Check for local high-quality AI images (.jpg/.png) matching slug/category
-        local_candidates = [
-            os.path.join(STATIC_PRODUCTS_DIR, f"{slug}.jpg"),
-            os.path.join(STATIC_PRODUCTS_DIR, f"{slug}.png"),
-            os.path.join(PRODUCTS_MEDIA_DIR, f"{slug}.jpg"),
-            os.path.join(PRODUCTS_MEDIA_DIR, f"{slug}.png"),
-        ]
-        
-        # Category specific gorgeous AI templates in directory
-        if cat_slug == 'footwear':
-            if p.get('gender') == 'W':
-                local_candidates.extend([
-                    os.path.join(STATIC_PRODUCTS_DIR, 'footwear_women.png'),
-                    os.path.join(STATIC_PRODUCTS_DIR, 'footwear_women.jpg'),
-                    os.path.join(PRODUCTS_MEDIA_DIR, 'footwear_women.png')
-                ])
-            else:
-                local_candidates.extend([
-                    os.path.join(STATIC_PRODUCTS_DIR, 'footwear_men.png'),
-                    os.path.join(STATIC_PRODUCTS_DIR, 'footwear_men.jpg'),
-                    os.path.join(PRODUCTS_MEDIA_DIR, 'footwear_men.png')
-                ])
-        elif cat_slug == 'accessories':
-            if p.get('gender') == 'W':
-                local_candidates.extend([
-                    os.path.join(STATIC_PRODUCTS_DIR, 'accessories_women.png'),
-                    os.path.join(STATIC_PRODUCTS_DIR, 'accessories_women.jpg'),
-                    os.path.join(PRODUCTS_MEDIA_DIR, 'accessories_women.png')
-                ])
-            else:
-                local_candidates.extend([
-                    os.path.join(STATIC_PRODUCTS_DIR, 'accessories_men.png'),
-                    os.path.join(STATIC_PRODUCTS_DIR, 'accessories_men.jpg'),
-                    os.path.join(PRODUCTS_MEDIA_DIR, 'accessories_men.png')
-                ])
-        elif cat_slug == 'outerwear':
-            if p.get('gender') == 'W':
-                local_candidates.extend([
-                    os.path.join(STATIC_PRODUCTS_DIR, 'outerwear_women.png'),
-                    os.path.join(STATIC_PRODUCTS_DIR, 'outerwear_women.jpg'),
-                    os.path.join(PRODUCTS_MEDIA_DIR, 'outerwear_women.png')
-                ])
-            else:
-                local_candidates.extend([
-                    os.path.join(STATIC_PRODUCTS_DIR, 'outerwear_men.png'),
-                    os.path.join(STATIC_PRODUCTS_DIR, 'outerwear_men.jpg'),
-                    os.path.join(PRODUCTS_MEDIA_DIR, 'outerwear_men.png')
-                ])
-        elif cat_slug == 'knitwear':
-            if p.get('gender') == 'W':
-                local_candidates.extend([
-                    os.path.join(STATIC_PRODUCTS_DIR, 'knitwear_women.png'),
-                    os.path.join(STATIC_PRODUCTS_DIR, 'knitwear_women.jpg'),
-                    os.path.join(PRODUCTS_MEDIA_DIR, 'knitwear_women.png')
-                ])
-            else:
-                local_candidates.extend([
-                    os.path.join(STATIC_PRODUCTS_DIR, 'knitwear_men.png'),
-                    os.path.join(STATIC_PRODUCTS_DIR, 'knitwear_men.jpg'),
-                    os.path.join(PRODUCTS_MEDIA_DIR, 'knitwear_men.png')
-                ])
-        elif cat_slug == 'shirts' or cat_slug == 'tops':
-            if p.get('gender') == 'W':
-                local_candidates.extend([
-                    os.path.join(STATIC_PRODUCTS_DIR, 'shirt_women.png'),
-                    os.path.join(STATIC_PRODUCTS_DIR, 'shirt_women.jpg'),
-                    os.path.join(PRODUCTS_MEDIA_DIR, 'shirt_women.png')
-                ])
-            else:
-                local_candidates.extend([
-                    os.path.join(STATIC_PRODUCTS_DIR, 'shirt_men.png'),
-                    os.path.join(STATIC_PRODUCTS_DIR, 'shirt_men.jpg'),
-                    os.path.join(PRODUCTS_MEDIA_DIR, 'shirt_men.png')
-                ])
-        elif cat_slug == 'trousers':
-            if p.get('gender') == 'W':
-                local_candidates.extend([
-                    os.path.join(STATIC_PRODUCTS_DIR, 'trouser_women.png'),
-                    os.path.join(STATIC_PRODUCTS_DIR, 'trouser_women.jpg'),
-                    os.path.join(PRODUCTS_MEDIA_DIR, 'trouser_women.png')
-                ])
-            else:
-                local_candidates.extend([
-                    os.path.join(STATIC_PRODUCTS_DIR, 'trouser_men.png'),
-                    os.path.join(STATIC_PRODUCTS_DIR, 'trouser_men.jpg'),
-                    os.path.join(PRODUCTS_MEDIA_DIR, 'trouser_men.png')
-                ])
-        
-        # Select first matching candidate
+        # 2. Check for local high-quality AI images in products directory if any
         if not src_path:
+            local_candidates = [
+                os.path.join(STATIC_PRODUCTS_DIR, f"{slug}.jpg"),
+                os.path.join(STATIC_PRODUCTS_DIR, f"{slug}.png"),
+            ]
             for cand in local_candidates:
-                if cand and os.path.exists(cand):
+                if os.path.exists(cand):
                     src_path = cand
                     break
         
-        # 3. Copy image or fall back to programmatic generator
+        # 3. Copy image if found
+        has_image = False
         if src_path:
             shutil.copy(src_path, dest_path)
             print(f"   [IMG] Copied high-quality image for: {slug} from {os.path.basename(src_path)}")
-        elif generate_product_image:
-            generate_product_image(slug, cat_slug, idx)
-            print(f"   [IMG] Generated programmatic PIL image for: {slug}")
+            has_image = True
         else:
-            print(f"   [WARN] No image source or generator for: {slug}")
+            print(f"   [INFO] No high-quality image source for: {slug}. Falling back to elegant VORN text placeholder in UI.")
 
         obj, created = Product.objects.update_or_create(
             slug=slug,
@@ -442,12 +349,15 @@ def seed_database():
         )
         print(f"{'[CREATED]' if created else '[UPDATED]'} Product: {obj.name} (Rs. {obj.price})")
 
-        # Attach image to product model
+        # Attach image to product model ONLY if we copied a real image
         obj.images.all().delete()
-        relative_img_path = f"products/{unique_img_name}"
-        pi = ProductImage(product=obj, image=relative_img_path, is_primary=True, sort_order=0, alt_text=obj.name)
-        pi.save()
-        print(f"   Attached unique image: {relative_img_path}")
+        if has_image:
+            relative_img_path = f"products/{unique_img_name}"
+            pi = ProductImage(product=obj, image=relative_img_path, is_primary=True, sort_order=0, alt_text=obj.name)
+            pi.save()
+            print(f"   Attached unique image: {relative_img_path}")
+        else:
+            print(f"   No product image attached (uses CSS placeholder)")
 
         # Generate variants (sizes)
         sizes = get_sizes_for_category(cat_slug)
